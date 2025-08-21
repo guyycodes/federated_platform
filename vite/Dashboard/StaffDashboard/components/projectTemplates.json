@@ -1,0 +1,68 @@
+[
+  {
+    "id": "gpt-code-assistant",
+    "name": "GPT Code Assistant",
+    "icon": "Psychology",
+    "iconSize": 40,
+    "description": "AI-powered code generation and review",
+    "category": "development",
+    "difficulty": "intermediate",
+    "estimatedTime": "2-3 hours",
+    "popularityScore": 95
+  },
+  {
+    "id": "document-analyzer",
+    "name": "Document Analyzer (OCR)",
+    "icon": "ContentCopy",
+    "iconSize": 40,
+    "description": "Extract insights from documents with LLMs",
+    "category": "productivity",
+    "difficulty": "beginner",
+    "estimatedTime": "1-2 hours",
+    "popularityScore": 88
+  },
+  {
+    "id": "audio-transcription",
+    "name": "Translation + Transcription/Speech-to-Text",
+    "icon": "Description",
+    "iconSize": 40,
+    "description": "Turn audio into text",
+    "category": "productivity",
+    "difficulty": "intermediate",
+    "estimatedTime": "1-2 hours",
+    "popularityScore": 88
+  },
+  {
+    "id": "content-creator",
+    "name": "Content Creator",
+    "icon": "Language",
+    "iconSize": 40,
+    "description": "Create content for a variety of platforms",
+    "category": "productivity",
+    "difficulty": "intermediate",
+    "estimatedTime": "1-2 hours",
+    "popularityScore": 88
+  },
+  {
+    "id": "sentiment-nlp",
+    "name": "Sentiment Analysis (NLP)",
+    "icon": "Analytics",
+    "iconSize": 40,
+    "description": "Real-time sentiment detection for text",
+    "category": "analytics",
+    "difficulty": "beginner",
+    "estimatedTime": "1 hour",
+    "popularityScore": 92
+  },
+  {
+    "id": "custom-plugin",
+    "name": "Start from Scratch",
+    "icon": "Code",
+    "iconSize": 40,
+    "description": "Build your own custom ML/LLM plugin",
+    "category": "custom",
+    "difficulty": "advanced",
+    "estimatedTime": "Varies",
+    "popularityScore": 75
+  }
+]

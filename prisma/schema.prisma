@@ -1,5 +1,5 @@
 // Prisma schema for Federated Audit Platform
-// Supports modular audit procedures with tiered access plans
+// Supports modular audit procedures with license-based access
 
 generator client {
   provider = "prisma-client-js"
@@ -89,7 +89,7 @@ model User {
   @@map("users")
 }
 
-// Subscription accounts with plan tiers
+// Subscription accounts with license types
 model Account {
   id             String   @id @default(cuid())
   organizationId String
@@ -98,8 +98,8 @@ model Account {
   accountName    String   // "Main Account", "Federal Division", etc.
   accountNumber  String   @unique @default(cuid())
   
-  // Plan information
-  planTier       PlanTier
+  // License information
+  licenseType    LicenseType
   customPlan     Json?    // For enterprise custom configurations
   
   // Subscription details
@@ -145,6 +145,7 @@ model Module {
   name           String
   description    String   @db.Text
   category       ModuleCategory
+  gitRepo     String?  // GitHub repository URL
   
   // Framework compliance
   framework      AuditFramework
@@ -163,9 +164,10 @@ model Module {
   // API configuration
   apiEndpoint    String?  // Module's internal API endpoint
   webhookUrl     String?  // For async operations
+  backendUrl  String?
   
   // Access control
-  minPlanTier    PlanTier // Minimum plan required
+  minLicenseType LicenseType // Minimum license required
   requiresApproval Boolean @default(false) // Federal modules may require approval
   
   // Audit methodology
@@ -557,10 +559,10 @@ model ActivityLog {
 
 // ENUMS
 
-enum PlanTier {
+enum LicenseType {
   COMMERCIAL
-  ENTERPRISE
   FEDERAL
+  INTERNATIONAL
 }
 
 enum OrganizationSize {

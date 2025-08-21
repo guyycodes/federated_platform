@@ -1,0 +1,1 @@
+// vite/Components/plugins/PluginRegistry.jsx

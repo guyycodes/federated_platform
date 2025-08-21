@@ -1,0 +1,654 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../vite/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Business users who log into the system
+model User {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  firstName String
+  lastName  String
+  phone     String?
+
+  // Clerk integration (required for business users)
+  clerkUserId String @unique
+
+  // Role and permissions
+  role     UserRole @default(UNSET)
+  isActive Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  ownedLocations Location[]          @relation("LocationOwner")
+  locationAccess UserAdministrator[] // For location admins
+
+  customerAccount    Customer? // If user is also a customer
+  hasCustomerAccount Boolean   @default(false)
+
+  // Plugin relationships
+  createdPlugins Plugin[] @relation("PluginCreator")
+
+  @@map("users")
+}
+
+// Plugin model - represents plugins created by users
+model Plugin {
+  id        String @id @default(cuid())
+  creatorId String // User who created the plugin
+
+  // Basic info
+  name        String
+  description String
+  category    PluginCategory
+
+  // Template and repository info
+  templateId String // Which template was used
+  template   Json // Frontend/Backend template configuration
+  gitRepo    String? // GitHub repository URL
+
+  // Pricing configuration
+  pricingModel     PricingModel @default(FREEMIUM)
+  oneTimePrice     Float? // For ONE_TIME pricing
+  subscriptionTier String? // For SUBSCRIPTION pricing (Individual, Pro, Enterprise)
+  usagePrice       Float? // Per request for USAGE_BASED
+
+  // Features
+  whiteLabel  Boolean @default(false)
+  isPublished Boolean @default(false)
+  isActive    Boolean @default(true)
+
+  // Deployment info
+  deploymentStatus DeploymentStatus @default(PENDING)
+  deploymentUrl    String?
+  apiEndpoint      String?
+
+  // Metrics
+  totalInstalls      Int   @default(0)
+  monthlyActiveUsers Int   @default(0)
+  totalRevenue       Float @default(0)
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  // Relationships
+  creator         User             @relation("PluginCreator", fields: [creatorId], references: [id])
+  purchases       PluginPurchase[]
+  usageRecords    PluginUsage[]
+  githubCallbacks GithubCallback[]
+
+  @@index([isPublished])
+  @@index([creatorId])
+  @@map("plugins")
+}
+
+// Tracks customer plugin purchases/subscriptions
+model PluginPurchase {
+  id         String @id @default(cuid())
+  customerId String
+  pluginId   String
+
+  // Purchase details
+  purchaseType PurchaseType // ONE_TIME, SUBSCRIPTION
+  amount       Float
+
+  // Subscription details (if applicable)
+  subscriptionStatus    SubscriptionStatus?
+  subscriptionStartDate DateTime?
+  subscriptionEndDate   DateTime?
+  nextBillingDate       DateTime?
+
+  // Access control
+  isActive Boolean @default(true)
+  apiKey   String? @unique // For API access
+
+  // Usage limits (for freemium/usage-based)
+  usageLimit Int? // Monthly request limit
+  usageCount Int  @default(0) // Current month usage
+
+  // Timestamps
+  purchasedAt DateTime  @default(now())
+  lastUsedAt  DateTime?
+
+  // Relationships
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  plugin       Plugin        @relation(fields: [pluginId], references: [id])
+  usageRecords PluginUsage[]
+
+  @@unique([customerId, pluginId])
+  @@index([customerId])
+  @@index([pluginId])
+  @@map("plugin_purchases")
+}
+
+// Tracks usage for analytics and billing
+model PluginUsage {
+  id         String @id @default(cuid())
+  purchaseId String
+  pluginId   String
+
+  // Usage details
+  endpoint     String // Which API endpoint was called
+  method       String // HTTP method
+  statusCode   Int // Response status
+  responseTime Int // In milliseconds
+
+  // Request/Response size for billing
+  requestSize  Int? // In bytes
+  responseSize Int? // In bytes
+
+  // Metadata
+  userAgent String?
+  ipAddress String?
+
+  timestamp DateTime @default(now())
+
+  // Relationships
+  purchase PluginPurchase @relation(fields: [purchaseId], references: [id])
+  plugin   Plugin         @relation(fields: [pluginId], references: [id])
+
+  @@index([purchaseId, timestamp])
+  @@index([pluginId, timestamp])
+  @@map("plugin_usage")
+}
+
+// Junction table for user-location access (for location admins etc.)
+model UserAdministrator {
+  id         String @id @default(cuid())
+  userId     String
+  locationId String
+
+  // Permissions for this location
+  canViewFinancials   Boolean @default(false)
+  canManageStaff      Boolean @default(false)
+  canEditAppointments Boolean @default(true)
+  canViewReports      Boolean @default(true)
+
+  assignedAt DateTime @default(now())
+  assignedBy String? // ID of user who granted access
+
+  // Relationships
+  user     User     @relation(fields: [userId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+
+  @@unique([userId, locationId])
+  @@map("user_locations")
+}
+
+// Assigned territory information (once a territory is sold)
+model Territory {
+  id         String @id @default(cuid())
+  locationId String @unique
+
+  // Territory details (copied from TerritoriesAvailable when assigned)
+  territoryCode String @unique
+  territoryName String
+
+  // Contact information for territory
+  territoryAddress String?
+  territoryCity    String?
+  territoryState   String?
+  territoryZipCode String?
+  territoryPhone   String?
+  territoryEmail   String?
+
+  // Territory performance
+  exclusiveRadius   Float? // Miles of exclusivity
+  populationServed  Int?
+  marketPenetration Float? // Percentage of market captured
+
+  // Assignment details
+  assignedAt DateTime @default(now())
+
+  // Relationships
+  location Location @relation(fields: [locationId], references: [id])
+
+  @@map("territories")
+}
+
+// Customer Satisfaction Index tracking over time
+model CSI {
+  id         String @id @default(cuid())
+  locationId String
+
+  // CSI details
+  score   Int // 1-5 scale
+  comment String?
+  source  CSISource @default(CUSTOMER)
+
+  // Survey details
+  surveyType String? // "post-appointment", "monthly", "annual"
+  customerId String? // If from specific customer
+
+  // Tracking
+  recordedAt DateTime @default(now())
+  recordedBy String? // User ID who recorded it
+
+  // Relationships
+  location Location  @relation(fields: [locationId], references: [id])
+  customer Customer? @relation(fields: [customerId], references: [id])
+
+  @@map("csi_records")
+}
+
+// Updated Location model - much cleaner now
+model Location {
+  id       String  @id @default(cuid())
+  name     String // "Downtown Paws", "Westside Grooming"
+  address  String
+  city     String
+  state    String
+  zipCode  String
+  phone    String
+  email    String
+  isActive Boolean @default(true)
+
+  // Franchise-specific fields
+  franchiseId      String? // Unique franchise identifier
+  ownerId          String? // Franchisee user ID
+  franchiseFeeRate Float?  @default(0.06) // 6% franchise fee
+  royaltyRate      Float?  @default(0.04) // 4% royalty
+
+  // Business settings
+  timezone      String @default("America/Chicago")
+  businessHours Json? // Store as JSON: {"mon": "9-17", "tue": "9-17"}
+
+  // Performance tracking
+  currentCSIAverage Float? // Calculated from recent CSI records
+  lastCSIUpdate     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  owner         User?               @relation("LocationOwner", fields: [ownerId], references: [id])
+  territory     Territory? // One-to-one relationship
+  csiRecords    CSI[] // Multiple CSI scores over time
+  adminUsers    UserAdministrator[]
+  customers     Customer[]
+  appointments  Appointment[]
+  subscriptions Subscription[]
+  orders        Order[]
+  products      Product[]
+  franchiseFees FranchiseFee[]
+
+  @@map("locations")
+}
+
+// Territories available for franchising
+model TerritoriesAvailable {
+  id String @id @default(cuid())
+
+  // Territory definition
+  territoryCode String @unique // "TX-AUSTIN-NORTH", "CA-LA-WEST"
+  territoryName String // "North Austin", "West Los Angeles"
+
+  // Geographic boundaries
+  state    String
+  city     String? // null if covers multiple cities
+  zipCodes String[] // Array of zip codes covered
+  county   String?
+
+  // Market info
+  estimatedPopulation Int?
+  averageIncome       Float?
+  competitorCount     Int?    @default(0)
+  marketPotential     String? // "HIGH", "MEDIUM", "LOW"
+
+  // Franchise terms
+  franchiseFee      Float  @default(45000) // Initial franchise fee
+  minimumInvestment Float? // Estimated startup cost
+  exclusiveRadius   Float? // Miles of exclusivity
+
+  // Availability
+  isAvailable   Boolean   @default(true)
+  reservedUntil DateTime? // Hold period for interested prospects
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("territories_available")
+}
+
+// Updated Customer model to link to plugin purchases
+model Customer {
+  id         String  @id @default(cuid())
+  locationId String? // Made optional with ?
+
+  // Optional user account (for online portal access)
+  userId String? @unique // Links to User if they create online account
+
+  // Basic info
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  role      UserRole @default(CUSTOMER) // Every customer gets CUSTOMER role
+
+  // Dog information
+  dogName   String?
+  dogBreed  String?
+  dogAge    Int?
+  dogWeight Float?
+  allergies String?
+
+  // Customer preferences
+  preferredGroomer String?
+  notes            String?
+
+  // Square integration
+  squareCustomerId String? @unique
+
+  // Account status
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  location      Location?      @relation(fields: [locationId], references: [id])
+  userAccount   User?          @relation(fields: [userId], references: [id])
+  appointments  Appointment[]
+  subscriptions Subscription[]
+  orders        Order[]
+  csiRecords    CSI[] // Customer satisfaction surveys
+
+  // Plugin relationships
+  pluginPurchases PluginPurchase[]
+
+  @@unique([email, locationId])
+  @@map("customers")
+}
+
+// Franchise fee tracking
+model FranchiseFee {
+  id         String @id @default(cuid())
+  locationId String
+
+  // Fee period
+  month Int // 1-12
+  year  Int
+
+  // Revenue breakdown
+  serviceRevenue      Float
+  productRevenue      Float
+  subscriptionRevenue Float
+  totalRevenue        Float
+
+  // Calculated fees
+  franchiseFee Float // Based on franchiseFeeRate
+  royaltyFee   Float // Based on royaltyRate
+  totalFees    Float
+
+  // Payment tracking
+  isPaid  Boolean   @default(false)
+  paidAt  DateTime?
+  dueDate DateTime
+
+  createdAt DateTime @default(now())
+
+  // Relationships
+  location Location @relation(fields: [locationId], references: [id])
+
+  @@unique([locationId, month, year])
+  @@map("franchise_fees")
+}
+
+// Service appointments
+model Appointment {
+  id         String @id @default(cuid())
+  locationId String
+  customerId String
+
+  // Appointment details
+  serviceType String // "Full Groom", "Bath Only", "Nail Trim"
+  scheduledAt DateTime
+  duration    Int // minutes
+  price       Float
+  notes       String?
+
+  // Staff assignment
+  assignedTo String? // Staff member name or ID
+
+  // Status tracking
+  status      AppointmentStatus @default(SCHEDULED)
+  completedAt DateTime?
+
+  // Square integration
+  squareOrderId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  location Location @relation(fields: [locationId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@map("appointments")
+}
+
+// Subscription packages (monthly grooming, etc.)
+model Subscription {
+  id         String @id @default(cuid())
+  locationId String
+  customerId String
+
+  // Package details
+  packageType     String // "Monthly Groom", "Bi-weekly Bath"
+  price           Float // per billing cycle
+  billingInterval String // "monthly", "weekly"
+
+  // Status
+  status          SubscriptionStatus @default(ACTIVE)
+  startDate       DateTime
+  nextBillingDate DateTime?
+  canceledAt      DateTime?
+
+  // Square integration
+  squareSubscriptionId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  location Location @relation(fields: [locationId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@map("subscriptions")
+}
+
+// Products for sale (merchandise)
+model Product {
+  id         String  @id @default(cuid())
+  locationId String? // where the item is stocked
+
+  // Product info
+  name        String
+  description String?
+  category    String // "Shampoo", "Toys", "Apparel", "Accessories"
+  price       Float
+  cost        Float? // for profit margin tracking
+
+  // Inventory
+  stockQuantity     Int @default(0)
+  lowStockThreshold Int @default(5)
+
+  // Square integration
+  squareItemId String? @unique
+
+  // Media
+  imageUrl String?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  location   Location?   @relation(fields: [locationId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+// Customer orders (merchandise purchases)
+model Order {
+  id         String  @id @default(cuid())
+  locationId String // when purchased the trritory/franchisee id goes here so its known who is credited for the sale
+  customerId String? // null for walk-in purchases
+
+  // Order details
+  subtotal Float
+  tax      Float       @default(0)
+  total    Float
+  status   OrderStatus @default(PENDING)
+
+  // Fulfillment
+  shippingAddress String?
+  fulfilledAt     DateTime?
+
+  // Square integration
+  squareOrderId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  location Location    @relation(fields: [locationId], references: [id])
+  customer Customer?   @relation(fields: [customerId], references: [id])
+  items    OrderItem[]
+
+  @@map("orders")
+}
+
+// Individual items in an order
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  discount  String? // discount code or percentage
+
+  quantity Int
+  price    Float // Price at time of purchase
+
+  // Relationships
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// GitHub dispatch callbacks
+model GithubCallback {
+  id         String @id @default(cuid())
+  callbackId String @unique
+
+  // Stream data
+  streamUrl    String?
+  streamStatus String?
+
+  // Generic data storage
+  data Json?
+
+  // Plugin creation tracking
+  pluginId String? // Link to created plugin if applicable
+  plugin   Plugin? @relation(fields: [pluginId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("github_callbacks")
+}
+
+// Add CSI Source enum
+enum CSISource {
+  CUSTOMER // Post-service survey
+  STAFF // Staff observation
+  MYSTERY_SHOPPER // Professional evaluation
+  ONLINE_REVIEW // Google/Yelp reviews
+  PHONE_SURVEY // Follow-up call
+  OTHER
+}
+
+// Plugin-related enums
+enum PluginCategory {
+  DEVELOPMENT
+  PRODUCTIVITY
+  ANALYTICS
+  LANGUAGE
+  AI_ML
+  AUTOMATION
+  INTEGRATION
+  OTHER
+}
+
+enum PricingModel {
+  FREEMIUM
+  ONE_TIME
+  SUBSCRIPTION
+  USAGE_BASED
+}
+
+enum PurchaseType {
+  ONE_TIME
+  SUBSCRIPTION
+}
+
+enum DeploymentStatus {
+  PENDING
+  DEVELOPMENT
+  STAGING
+  PRODUCTION
+  NEW
+  ERROR
+}
+
+// Enums
+enum UserRole {
+  UNSET // Default value
+  USER_ADMIN // Super admin - sees all locations
+  USER // Location owner - sees owned locations
+  LOCATION_ADMIN // Appointed by franchisee - limited access to location
+  CUSTOMER // Customer with online account
+  STAFF // Staff member
+  ACCOUNTANT // Accountant/bookeeper
+  OTHER // Other role
+}
+
+// Enums
+enum AppointmentStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  FULFILLED
+  CANCELLED
+  REFUNDED
+}

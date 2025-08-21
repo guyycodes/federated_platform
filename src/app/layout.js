@@ -1,6 +1,6 @@
 // Minimal layout required by Next.js App Router
 export const metadata = {
-  title: "federated_backend_api",
+  title: "Buster & Co API",
   description: "API Server",
 };
 
