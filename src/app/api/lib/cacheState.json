@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-01T00:07:22.126Z",
+  "lastUpdated": 1754006842126,
+  "cacheExpiry": "2025-08-01T00:12:22.126Z",
+  "stats": {
+    "totalPlugins": 0,
+    "categories": [],
+    "integrations": [],
+    "modalities": [],
+    "pluginsByCategory": {},
+    "pluginsByIntegration": {}
+  },
+  "plugins": [],
+  "fullRegistry": {
+    "version": "1.0.0",
+    "lastUpdated": "2025-07-19T20:58:05.366Z",
+    "plugins": []
+  }
+}

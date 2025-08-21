@@ -1,0 +1,724 @@
+// Prisma schema for Federated Audit Platform
+// Supports modular audit procedures with tiered access plans
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Organizations that subscribe to the audit platform
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  domain      String?  @unique // For SSO/email verification
+  
+  // Contact information
+  primaryContactEmail String
+  primaryContactName  String
+  primaryContactPhone String?
+  
+  // Billing contact (if different)
+  billingEmail        String?
+  billingContactName  String?
+  
+  // Organization details
+  industry            String?
+  size                OrganizationSize?
+  headquarters        String?
+  
+  // Compliance requirements
+  regulatoryBodies    String[] // ["NIST", "ISO", "SOC", "HIPAA", etc.]
+  
+  // Status
+  isActive            Boolean  @default(true)
+  onboardingComplete  Boolean  @default(false)
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  // Relationships
+  users               User[]
+  accounts            Account[] // Can have multiple accounts/subscriptions
+  auditProjects       AuditProject[]
+  workpapers          Workpaper[]
+  
+  @@map("organizations")
+}
+
+// Users within organizations
+model User {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Basic info
+  email          String   @unique
+  firstName      String
+  lastName       String
+  title          String?  // Job title
+  department     String?
+  
+  // Authentication
+  clerkUserId    String?  @unique // External auth provider
+  lastLoginAt    DateTime?
+  
+  // Permissions
+  role           UserRole @default(AUDITOR)
+  isActive       Boolean  @default(true)
+  
+  // Audit certifications
+  certifications String[] // ["CISA", "CISSP", "CPA", etc.]
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  moduleAccess   ModuleAccess[]
+  auditProjects  AuditProjectMember[]
+  workpapers     Workpaper[] @relation("WorkpaperCreator")
+  reviews        WorkpaperReview[]
+  activityLogs   ActivityLog[]
+  
+  @@index([organizationId])
+  @@map("users")
+}
+
+// Subscription accounts with plan tiers
+model Account {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Account details
+  accountName    String   // "Main Account", "Federal Division", etc.
+  accountNumber  String   @unique @default(cuid())
+  
+  // Plan information
+  planTier       PlanTier
+  customPlan     Json?    // For enterprise custom configurations
+  
+  // Subscription details
+  status         AccountStatus @default(TRIAL)
+  trialEndsAt    DateTime?
+  
+  // Billing
+  billingCycle   BillingCycle @default(ANNUAL)
+  nextBillingDate DateTime?
+  contractEndDate DateTime?
+  
+  // Usage limits
+  maxUsers       Int?     // null = unlimited
+  maxProjects    Int?     // null = unlimited
+  maxStorage     BigInt?  // in bytes, null = unlimited
+  
+  // Feature flags
+  features       Json     @default("{}") // Flexible feature configuration
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  activatedAt    DateTime?
+  suspendedAt    DateTime?
+  canceledAt     DateTime?
+  
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  moduleAccess   AccountModuleAccess[]
+  auditProjects  AuditProject[]
+  invoices       Invoice[]
+  usageRecords   UsageRecord[]
+  
+  @@index([organizationId])
+  @@map("accounts")
+}
+
+// Available audit modules in the platform
+model Module {
+  id             String   @id @default(cuid())
+  
+  // Module identification
+  code           String   @unique // "FISMA_AUDIT", "SOC2_TYPE2", etc.
+  name           String
+  description    String   @db.Text
+  category       ModuleCategory
+  
+  // Framework compliance
+  framework      AuditFramework
+  frameworkVersion String? // "NIST 800-53 Rev 5", etc.
+  
+  // Module details
+  version        String   @default("1.0.0")
+  isActive       Boolean  @default(true)
+  isBeta         Boolean  @default(false)
+  
+  // Environment configuration
+  containerImage String   // Docker image for the module
+  resourceRequirements Json // CPU, memory, etc.
+  environmentVars Json    @default("{}") // Default env vars
+  
+  // API configuration
+  apiEndpoint    String?  // Module's internal API endpoint
+  webhookUrl     String?  // For async operations
+  
+  // Access control
+  minPlanTier    PlanTier // Minimum plan required
+  requiresApproval Boolean @default(false) // Federal modules may require approval
+  
+  // Audit methodology
+  methodology    String   @db.Text // Description of audit approach
+  estimatedHours Int?     // Typical hours to complete
+  
+  // Dependencies
+  dependsOn      String[] // Other module codes this depends on
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  publishedAt    DateTime?
+  deprecatedAt   DateTime?
+  
+  // Relationships
+  accountAccess  AccountModuleAccess[]
+  userAccess     ModuleAccess[]
+  projects       AuditProject[]
+  templates      WorkpaperTemplate[]
+  environments   ModuleEnvironment[]
+  
+  @@index([framework])
+  @@index([category])
+  @@map("modules")
+}
+
+// Module access at account level
+model AccountModuleAccess {
+  id          String   @id @default(cuid())
+  accountId   String
+  moduleId    String
+  
+  // Access control
+  isEnabled   Boolean  @default(true)
+  expiresAt   DateTime? // For time-limited access
+  
+  // Custom configuration
+  configuration Json   @default("{}") // Account-specific module settings
+  
+  grantedAt   DateTime @default(now())
+  grantedBy   String?  // User ID who granted access
+  
+  // Relationships
+  account     Account  @relation(fields: [accountId], references: [id])
+  module      Module   @relation(fields: [moduleId], references: [id])
+  
+  @@unique([accountId, moduleId])
+  @@map("account_module_access")
+}
+
+// Individual user access to modules
+model ModuleAccess {
+  id          String   @id @default(cuid())
+  userId      String
+  moduleId    String
+  
+  // Permissions
+  canExecute  Boolean  @default(true)  // Can run the module
+  canConfigure Boolean @default(false) // Can change module settings
+  canViewResults Boolean @default(true) // Can see audit results
+  
+  grantedAt   DateTime @default(now())
+  grantedBy   String?  // User ID who granted access
+  
+  // Relationships
+  user        User     @relation(fields: [userId], references: [id])
+  module      Module   @relation(fields: [moduleId], references: [id])
+  
+  @@unique([userId, moduleId])
+  @@map("module_access")
+}
+
+// Audit project instances
+model AuditProject {
+  id             String   @id @default(cuid())
+  organizationId String
+  accountId      String
+  moduleId       String
+  
+  // Project details
+  name           String
+  description    String?  @db.Text
+  auditPeriod    Json     // {"start": "2024-01-01", "end": "2024-12-31"}
+  
+  // Status tracking
+  status         ProjectStatus @default(PLANNING)
+  progress       Int      @default(0) // 0-100 percentage
+  
+  // Scheduling
+  plannedStartDate DateTime?
+  plannedEndDate   DateTime?
+  actualStartDate  DateTime?
+  actualEndDate    DateTime?
+  
+  // Risk assessment
+  riskLevel      RiskLevel?
+  materialityThreshold Float? // Dollar amount for materiality
+  
+  // Environment
+  environmentId  String?  @unique // Links to sandboxed environment
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  account        Account      @relation(fields: [accountId], references: [id])
+  module         Module       @relation(fields: [moduleId], references: [id])
+  environment    ModuleEnvironment? @relation(fields: [environmentId], references: [id])
+  members        AuditProjectMember[]
+  workpapers     Workpaper[]
+  findings       Finding[]
+  
+  @@index([organizationId])
+  @@index([status])
+  @@map("audit_projects")
+}
+
+// Project team members
+model AuditProjectMember {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  
+  role        ProjectRole @default(TEAM_MEMBER)
+  assignedAt  DateTime @default(now())
+  assignedBy  String?  // User ID who assigned
+  
+  // Relationships
+  project     AuditProject @relation(fields: [projectId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
+  
+  @@unique([projectId, userId])
+  @@map("audit_project_members")
+}
+
+// Sandboxed module environments
+model ModuleEnvironment {
+  id          String   @id @default(cuid())
+  moduleId    String
+  
+  // Environment details
+  environmentId String  @unique // External environment ID (K8s, Docker, etc.)
+  status      EnvironmentStatus @default(PROVISIONING)
+  
+  // Resource allocation
+  allocatedCpu    Int     // millicores
+  allocatedMemory Int     // MB
+  allocatedStorage BigInt  // bytes
+  
+  // Networking
+  internalUrl  String?  // Internal API endpoint
+  publicUrl    String?  // If exposed publicly
+  
+  // Security
+  isolationLevel String  @default("strict") // "strict", "standard", "relaxed"
+  secretsRef     String? // Reference to secrets manager
+  
+  // Lifecycle
+  createdAt    DateTime @default(now())
+  startedAt    DateTime?
+  stoppedAt    DateTime?
+  destroyedAt  DateTime?
+  lastHealthCheck DateTime?
+  
+  // Relationships
+  module       Module   @relation(fields: [moduleId], references: [id])
+  project      AuditProject?
+  
+  @@map("module_environments")
+}
+
+// Audit workpapers generated by modules
+model Workpaper {
+  id             String   @id @default(cuid())
+  projectId      String
+  organizationId String
+  
+  // Workpaper identification
+  referenceNumber String  // "A-1", "B-2.1", etc.
+  title          String
+  description    String?  @db.Text
+  
+  // Content
+  content        Json     // Structured workpaper content
+  attachments    String[] // File URLs/references
+  
+  // Metadata
+  type           WorkpaperType
+  confidentiality ConfidentialityLevel @default(INTERNAL)
+  
+  // Creation details
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Module generation info
+  generatedByModule Boolean @default(false)
+  moduleVersion    String? // Version of module that generated it
+  generationMetadata Json?  // Module-specific metadata
+  
+  // Review workflow
+  status         WorkpaperStatus @default(DRAFT)
+  completedAt    DateTime?
+  
+  // Relationships
+  project        AuditProject @relation(fields: [projectId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  creator        User         @relation("WorkpaperCreator", fields: [createdBy], references: [id])
+  reviews        WorkpaperReview[]
+  findings       Finding[]
+  
+  @@unique([projectId, referenceNumber])
+  @@index([projectId])
+  @@index([type])
+  @@map("workpapers")
+}
+
+// Workpaper review process
+model WorkpaperReview {
+  id          String   @id @default(cuid())
+  workpaperId String
+  reviewerId  String
+  
+  // Review details
+  status      ReviewStatus @default(PENDING)
+  comments    String?      @db.Text
+  
+  // Timestamps
+  assignedAt  DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  // Relationships
+  workpaper   Workpaper @relation(fields: [workpaperId], references: [id])
+  reviewer    User      @relation(fields: [reviewerId], references: [id])
+  
+  @@map("workpaper_reviews")
+}
+
+// Audit findings
+model Finding {
+  id          String   @id @default(cuid())
+  projectId   String
+  workpaperId String?
+  
+  // Finding details
+  title       String
+  description String   @db.Text
+  severity    FindingSeverity
+  category    String   // "Control Deficiency", "Compliance Gap", etc.
+  
+  // Risk assessment
+  likelihood  Int      // 1-5 scale
+  impact      Int      // 1-5 scale
+  riskScore   Int      // Calculated: likelihood * impact
+  
+  // Recommendations
+  recommendation String @db.Text
+  managementResponse String? @db.Text
+  
+  // Status tracking
+  status      FindingStatus @default(OPEN)
+  targetDate  DateTime?     // Target remediation date
+  actualDate  DateTime?     // Actual remediation date
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  project     AuditProject @relation(fields: [projectId], references: [id])
+  workpaper   Workpaper?   @relation(fields: [workpaperId], references: [id])
+  
+  @@index([projectId])
+  @@index([severity])
+  @@map("findings")
+}
+
+// Workpaper templates provided by modules
+model WorkpaperTemplate {
+  id          String   @id @default(cuid())
+  moduleId    String
+  
+  // Template details
+  name        String
+  description String?
+  category    String   // "Risk Assessment", "Control Testing", etc.
+  
+  // Template content
+  structure   Json     // JSON schema for the workpaper
+  sampleData  Json?    // Example filled template
+  
+  // Versioning
+  version     String   @default("1.0.0")
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  module      Module   @relation(fields: [moduleId], references: [id])
+  
+  @@map("workpaper_templates")
+}
+
+// Usage tracking for billing
+model UsageRecord {
+  id          String   @id @default(cuid())
+  accountId   String
+  
+  // Usage details
+  metric      UsageMetric
+  quantity    Float
+  unit        String   // "hours", "GB", "API calls", etc.
+  
+  // Time period
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  // Billing
+  rate        Float?   // Cost per unit
+  totalCost   Float?
+  
+  recordedAt  DateTime @default(now())
+  
+  // Relationships
+  account     Account  @relation(fields: [accountId], references: [id])
+  
+  @@index([accountId, periodStart])
+  @@map("usage_records")
+}
+
+// Invoices for accounts
+model Invoice {
+  id          String   @id @default(cuid())
+  accountId   String
+  
+  // Invoice details
+  invoiceNumber String @unique
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  // Amounts
+  subtotal    Float
+  tax         Float    @default(0)
+  total       Float
+  
+  // Status
+  status      InvoiceStatus @default(DRAFT)
+  dueDate     DateTime
+  paidAt      DateTime?
+  
+  // Line items
+  lineItems   Json     // Array of line items
+  
+  createdAt   DateTime @default(now())
+  
+  // Relationships
+  account     Account  @relation(fields: [accountId], references: [id])
+  
+  @@map("invoices")
+}
+
+// Activity logging for audit trail
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  
+  // Activity details
+  action      String   // "LOGIN", "CREATE_PROJECT", "GENERATE_WORKPAPER", etc.
+  entityType  String   // "PROJECT", "WORKPAPER", "MODULE", etc.
+  entityId    String?
+  
+  // Additional context
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  
+  timestamp   DateTime @default(now())
+  
+  // Relationships
+  user        User?    @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@map("activity_logs")
+}
+
+// ENUMS
+
+enum PlanTier {
+  COMMERCIAL
+  ENTERPRISE
+  FEDERAL
+}
+
+enum OrganizationSize {
+  SMALL      // < 50 employees
+  MEDIUM     // 50-500 employees
+  LARGE      // 500-5000 employees
+  ENTERPRISE // > 5000 employees
+}
+
+enum UserRole {
+  ADMIN           // Organization admin
+  AUDIT_MANAGER   // Can manage projects and teams
+  AUDITOR         // Can perform audits
+  REVIEWER        // Can review workpapers
+  VIEWER          // Read-only access
+  EXTERNAL        // External party (client, regulator)
+}
+
+enum AccountStatus {
+  TRIAL
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+enum ModuleCategory {
+  COMPLIANCE      // FISMA, HIPAA, SOC2
+  RISK_ASSESSMENT
+  CONTROL_TESTING
+  VULNERABILITY
+  FINANCIAL
+  OPERATIONAL
+  IT_SECURITY
+  DATA_PRIVACY
+  CUSTOM
+}
+
+enum AuditFramework {
+  FISMA          // Federal Information Security Management Act
+  SOC1
+  SOC2_TYPE1
+  SOC2_TYPE2
+  ISO_27001
+  ISO_27017
+  ISO_27018
+  HIPAA
+  PCI_DSS
+  NIST_CSF       // NIST Cybersecurity Framework
+  NIST_800_53    // NIST Special Publication 800-53
+  NIST_800_171   // NIST SP 800-171
+  GDPR
+  CCPA
+  FEDRAMP
+  CMMC           // Cybersecurity Maturity Model Certification
+  CUSTOM
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  SUSPENDED
+  CANCELLED
+}
+
+enum ProjectRole {
+  PROJECT_LEAD
+  SENIOR_AUDITOR
+  TEAM_MEMBER
+  REVIEWER
+  OBSERVER
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EnvironmentStatus {
+  PROVISIONING
+  RUNNING
+  STOPPED
+  ERROR
+  TERMINATED
+}
+
+enum WorkpaperType {
+  PLANNING
+  RISK_ASSESSMENT
+  CONTROL_MATRIX
+  TESTING_PROCEDURE
+  EVIDENCE
+  OBSERVATION
+  CONCLUSION
+  MANAGEMENT_REP
+}
+
+enum WorkpaperStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  FINAL
+  ARCHIVED
+}
+
+enum ConfidentialityLevel {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  RESTRICTED
+}
+
+enum ReviewStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+  NEEDS_REVISION
+}
+
+enum FindingSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum FindingStatus {
+  OPEN
+  IN_PROGRESS
+  REMEDIATED
+  ACCEPTED    // Risk accepted by management
+  CLOSED
+}
+
+enum UsageMetric {
+  COMPUTE_HOURS
+  STORAGE_GB
+  API_CALLS
+  USERS
+  PROJECTS
+  WORKPAPERS
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
