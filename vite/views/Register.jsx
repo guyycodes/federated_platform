@@ -30,7 +30,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Lottie from 'lottie-react';
-import verificationAnimation from '/public/verification-animation.json';
+import verificationAnimation from '/public/red-blob.json';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CheckIcon from '@mui/icons-material/Check';
 import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth';
@@ -142,6 +142,10 @@ const Register = () => {
     
     // Validate invite token
     const validateInviteToken = async () => {
+      // TEMPORARILY DISABLED FOR TESTING
+      // setInviteStatus('valid');
+      // return;
+      
       if (!inviteToken) {
         setInviteStatus('invalid');
         return;

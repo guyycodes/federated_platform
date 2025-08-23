@@ -131,7 +131,7 @@ function App() {
       <Route path="/registration-sso-callback" element={<RegistrationSSOCallback />} />
       <Route path="/google-oauth-callback" element={<GoogleOAuthCallback />} />
 
-      <Route path="/subscriptions" element={<Subscriptions />} />
+      {/* <Route path="/subscriptions" element={<Subscriptions />} /> */}
   
       <Route path="/booking" element={<Booking />} />
       <Route path="/checkout" element={<Checkout />} />

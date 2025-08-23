@@ -34,7 +34,7 @@ const QUICK_LINKS = [
   { label: 'Home', path: '/' },
   { label: 'Book Demo', path: '/booking' },
   { label: 'About', path: '/about' },
-  { label: 'Contact', path: '/contact' }
+  { label: 'Contact', path: '/support' }
 ];
 
 const PLATFORM_LINKS = [

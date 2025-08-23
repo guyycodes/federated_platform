@@ -5,19 +5,21 @@ import {
   Typography, 
   TextField, 
   Button, 
-  Paper,
   Alert,
-  CircularProgress
+  CircularProgress,
+  alpha
 } from '@mui/material';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import Lottie from 'lottie-react';
-import verificationAnimation from '/public/verification-animation.json';
+import verificationAnimation from '/public/red-blob.json';
 import { Link as RouterLink } from 'react-router-dom';
 import HeaderBar from '../Components/ui/HeaderBar';
 import Footer from '../Components/ui/Footer';
 import ChatBot from '../Components/ui/ChatBot';
+import { useTheme } from '../Context/ThemeContext';
 
 const ForgotPassword = () => {
+  const { colors, gradients, fonts, glassmorphism } = useTheme();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -60,57 +62,197 @@ const ForgotPassword = () => {
       <Box
         sx={{
           minHeight: 'calc(100vh - 64px)',
-          bgcolor: '#f8f9fa',
+          background: gradients.darkGlass,
           py: 8,
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
+        {/* Animated gradient orbs */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '15%',
+            right: '10%',
+            width: 150,
+            height: 150,
+            background: gradients.primaryGradient,
+            borderRadius: '50%',
+            opacity: 0.4,
+            animation: 'forgotPulse 5s ease-in-out infinite',
+            '@keyframes forgotPulse': {
+              '0%, 100%': { transform: 'scale(1)', opacity: 0.4 },
+              '50%': { transform: 'scale(1.2)', opacity: 0.6 },
+            },
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: '20%',
+            left: '15%',
+            width: 120,
+            height: 120,
+            background: gradients.accentGradient,
+            borderRadius: '50%',
+            opacity: 0.3,
+            animation: 'forgotPulse 6s ease-in-out infinite 2s',
+          }}
+        />
+        
         <Container maxWidth="sm">
-          <Paper 
-            elevation={3} 
+          <Box 
             sx={{ 
-              p: { xs: 3, md: 5 },
-              borderRadius: 2,
-              background: 'white'
+              p: { xs: 4, md: 6 },
+              borderRadius: 4,
+              background: alpha(colors.glassWhite, 0.12),
+              backdropFilter: 'blur(25px)',
+              border: `1px solid ${alpha(colors.primary, 0.3)}`,
+              boxShadow: `0 25px 80px ${alpha(colors.primary, 0.4)}`,
+              position: 'relative',
+              zIndex: 2,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-3px)',
+                boxShadow: `0 30px 90px ${alpha(colors.primary, 0.5)}`,
+              },
             }}
           >
             <Box sx={{ mb: 4, textAlign: 'center' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                <Box sx={{ width: 40, height: 40, mr: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
+                <Box 
+                  sx={{ 
+                    width: 50, 
+                    height: 50, 
+                    mr: 2,
+                    borderRadius: '50%',
+                    background: alpha(colors.glassWhite, 0.15),
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: `2px solid ${alpha(colors.accent, 0.4)}`,
+                  }}
+                >
                   <Lottie 
                     animationData={verificationAnimation} 
                     loop={true}
                     autoplay={true}
-                    style={{ width: '100%', height: '90%' }}
+                    style={{ width: '80%', height: '80%' }}
                     aria-hidden="true"
                   />
                 </Box>
-                <Typography variant="h4" component="h1" fontWeight="bold" color="#1A2238">
-                  Buster & Co.
+                <Typography 
+                  variant="h4" 
+                  component="h1" 
+                  fontWeight="bold"
+                  sx={{
+                    fontFamily: fonts.brand,
+                    background: gradients.primaryGradient,
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 2px 4px rgba(79, 172, 254, 0.5))',
+                  }}
+                >
+                  BlackCore AI
                 </Typography>
               </Box>
               
-              <LockResetIcon sx={{ fontSize: 50, color: '#4CAF50', my: 2 }} />
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 70,
+                  height: 70,
+                  borderRadius: '50%',
+                  background: alpha(colors.glassWhite, 0.15),
+                  backdropFilter: 'blur(15px)',
+                  border: `2px solid ${alpha(colors.secondary, 0.4)}`,
+                  mb: 3,
+                }}
+              >
+                <LockResetIcon sx={{ fontSize: 35, color: colors.secondary }} />
+              </Box>
               
-              <Typography variant="h5" component="h2" fontWeight="medium" gutterBottom color="#1A2238">
+              <Typography 
+                variant="h5" 
+                component="h2" 
+                fontWeight="medium" 
+                gutterBottom
+                sx={{
+                  color: 'rgba(255,255,255,0.9)',
+                  fontFamily: fonts.heading,
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                }}
+              >
                 Reset Your Password
               </Typography>
-              <Typography variant="body2" color="rgba(113,122,144,0.8)">
+              <Typography 
+                variant="body2" 
+                sx={{
+                  color: 'rgba(255,255,255,0.7)',
+                  fontFamily: fonts.body,
+                  textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                }}
+              >
                 Enter your email address and we'll send you instructions to reset your password.
               </Typography>
             </Box>
 
             {submitted ? (
-              <Alert severity="success" sx={{ mb: 3 }}>
-                If an account exists for {email}, you will receive password reset instructions in your email shortly.
-              </Alert>
+              <Box
+                sx={{
+                  mb: 3,
+                  p: 2,
+                  borderRadius: 2,
+                  background: alpha('#4CAF50', 0.1),
+                  backdropFilter: 'blur(10px)',
+                  border: `1px solid ${alpha('#4CAF50', 0.3)}`,
+                  boxShadow: `0 8px 32px ${alpha('#4CAF50', 0.2)}`,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#4CAF50',
+                    fontFamily: fonts.body,
+                    textAlign: 'center',
+                    fontWeight: 'medium',
+                  }}
+                >
+                  If an account exists for {email}, you will receive password reset instructions in your email shortly.
+                </Typography>
+              </Box>
             ) : (
               <Box component="form" onSubmit={handleSubmit}>
                 {error && (
-                  <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
-                    {error}
-                  </Alert>
+                  <Box
+                    sx={{
+                      mb: 3,
+                      p: 2,
+                      borderRadius: 2,
+                      background: alpha('#ff5252', 0.1),
+                      backdropFilter: 'blur(10px)',
+                      border: `1px solid ${alpha('#ff5252', 0.3)}`,
+                      boxShadow: `0 8px 32px ${alpha('#ff5252', 0.2)}`,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: '#ff5252',
+                        fontFamily: fonts.body,
+                        textAlign: 'center',
+                        fontWeight: 'medium',
+                      }}
+                    >
+                      {error}
+                    </Typography>
+                  </Box>
                 )}
                 
                 <TextField
@@ -125,27 +267,32 @@ const ForgotPassword = () => {
                   sx={{
                     mb: 3,
                     '& .MuiInputLabel-root': {
-                      color: '#333333',
+                      color: 'rgba(255,255,255,0.7)',
+                      fontFamily: fonts.body,
                     },
                     '& .MuiOutlinedInput-root': {
+                      background: alpha(colors.glassWhite, 0.05),
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: 2,
                       '& fieldset': {
-                        borderColor: '#333333',
+                        borderColor: alpha(colors.accent, 0.3),
+                        borderWidth: '1px',
                       },
                       '&:hover fieldset': {
-                        borderColor: '#1A2238',
+                        borderColor: alpha(colors.accent, 0.5),
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#1A2238',
+                        borderColor: colors.accent,
+                        borderWidth: '2px',
+                        boxShadow: `0 0 20px ${alpha(colors.accent, 0.3)}`,
                       },
                     },
                     '& .MuiInputBase-input': {
-                      color: '#333333',
-                    },
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#1A2238',
+                      color: 'rgba(255,255,255,0.9)',
+                      fontFamily: fonts.body,
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: '#1A2238',
+                      color: colors.accent,
                     }
                   }}
                 />
@@ -157,14 +304,44 @@ const ForgotPassword = () => {
                   size="large"
                   disabled={isLoading}
                   sx={{
-                    bgcolor: '#4CAF50',
-                    color: 'white',
-                    py: 1.5,
+                    background: gradients.primaryGradient,
+                    backgroundSize: '200% 200%',
+                    color: '#ffffff',
+                    py: 2,
                     mb: 2,
-                    '&:hover': {
-                      bgcolor: '#45a049',
+                    fontWeight: 'bold',
+                    fontFamily: fonts.body,
+                    borderRadius: 3,
+                    border: 'none',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    animation: 'gradient-shift 4s ease infinite',
+                    '@keyframes gradient-shift': {
+                      '0%': { backgroundPosition: '0% 50%' },
+                      '50%': { backgroundPosition: '100% 50%' },
+                      '100%': { backgroundPosition: '0% 50%' },
                     },
-                    fontWeight: 'bold'
+                    '&:hover': {
+                      transform: 'translateY(-2px) scale(1.02)',
+                      boxShadow: `0 15px 40px ${alpha(colors.secondary, 0.4)}`,
+                    },
+                    '&:disabled': {
+                      opacity: 0.7,
+                      transform: 'none',
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: '-100%',
+                      width: '100%',
+                      height: '100%',
+                      background: gradients.shimmerGradient,
+                      transition: 'left 0.5s ease',
+                    },
+                    '&:hover::before': {
+                      left: '100%',
+                    }
                   }}
                 >
                   {isLoading ? (
@@ -180,18 +357,26 @@ const ForgotPassword = () => {
             )}
             
             <Box sx={{ mt: 3, textAlign: 'center' }}>
-              <Typography variant="body2" color="rgba(113,122,144,0.8)">
+              <Typography 
+                variant="body2" 
+                sx={{
+                  color: 'rgba(255,255,255,0.7)',
+                  fontFamily: fonts.body,
+                }}
+              >
                 Remember your password?{' '}
                 <Button
                   component={RouterLink}
                   to="/login"
                   sx={{ 
-                    color: '#4CAF50', 
+                    color: colors.accent, 
                     fontWeight: 'medium',
                     textTransform: 'none',
+                    fontFamily: fonts.body,
                     '&:hover': {
                       bgcolor: 'transparent',
-                      textDecoration: 'underline'
+                      textDecoration: 'underline',
+                      color: '#ffffff',
                     }
                   }}
                 >
@@ -199,18 +384,43 @@ const ForgotPassword = () => {
                 </Button>
               </Typography>
             </Box>
-          </Paper>
+
+            {/* Decorative gradient divider */}
+            <Box
+              sx={{
+                mt: 4,
+                height: 2,
+                background: gradients.primaryGradient,
+                borderRadius: 1,
+                opacity: 0.6,
+                backgroundSize: '200% 200%',
+                animation: 'gradient-shift 6s ease infinite',
+              }}
+            />
+          </Box>
           
-          <Box sx={{ mt: 3, textAlign: 'center' }}>
+          <Box sx={{ mt: 4, textAlign: 'center' }}>
             <Button
               component={RouterLink}
               to="/"
               sx={{ 
-                color: '#1A2238',
+                color: 'rgba(255,255,255,0.8)',
                 textTransform: 'none',
+                fontFamily: fonts.body,
+                fontWeight: 'medium',
+                py: 1.5,
+                px: 3,
+                borderRadius: 2,
+                background: alpha(colors.glassWhite, 0.05),
+                backdropFilter: 'blur(10px)',
+                border: `1px solid ${alpha(colors.accent, 0.2)}`,
+                transition: 'all 0.3s ease',
                 '&:hover': {
-                  bgcolor: 'transparent',
-                  textDecoration: 'underline'
+                  background: alpha(colors.accent, 0.1),
+                  borderColor: colors.accent,
+                  color: '#ffffff',
+                  transform: 'translateY(-2px)',
+                  boxShadow: `0 8px 24px ${alpha(colors.accent, 0.3)}`,
                 }
               }}
             >
