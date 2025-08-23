@@ -6,7 +6,7 @@ import {
   Button,
   alpha
 } from '@mui/material';
-import PetsIcon from '@mui/icons-material/Pets';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 import StarIcon from '@mui/icons-material/Star';
 import { Link as RouterLink } from 'react-router-dom';
 import HeaderBar from '../Components/ui/HeaderBar';
@@ -74,7 +74,7 @@ const NotFound = () => {
             left: '5%',
             width: 100,
             height: 100,
-            background: gradients.multiGradient,
+            background: gradients.primaryGradient,
             borderRadius: '50%',
             opacity: 0.25,
             animation: 'notFoundPulse 6s ease-in-out infinite 3s',
@@ -146,7 +146,7 @@ const NotFound = () => {
                 },
               }}
             >
-              <PetsIcon 
+              <SearchOffIcon 
                 sx={{ 
                   fontSize: 70,
                   color: colors.accent,
@@ -231,8 +231,8 @@ const NotFound = () => {
                 textShadow: '0 1px 2px rgba(0,0,0,0.2)',
               }}
             >
-              Looks like this page took a walk and got lost! Don't worry though - 
-              let's get you back on track to find exactly what you're looking for.
+              The page you're searching for couldn't be found in our audit database. 
+              Let's navigate you back to the main portal or our module documentation.
             </Typography>
             
             {/* Enhanced action buttons */}
@@ -251,7 +251,7 @@ const NotFound = () => {
                 variant="contained"
                 size="large"
                 sx={{ 
-                  background: gradients.multiGradient,
+                  background: gradients.primaryGradient,
                   backgroundSize: '200% 200%',
                   color: '#ffffff',
                   py: 1.8,
@@ -292,7 +292,7 @@ const NotFound = () => {
               
               <Button
                 component={RouterLink}
-                to="/care-guide"
+                to="/"
                 variant="outlined"
                 size="large"
                 sx={{ 
@@ -316,7 +316,7 @@ const NotFound = () => {
                   }
                 }}
               >
-                View Care Guide
+                View Modules
               </Button>
             </Box>
 
@@ -325,7 +325,7 @@ const NotFound = () => {
               sx={{
                 mt: 4,
                 height: 2,
-                background: gradients.multiGradient,
+                background: gradients.primaryGradient,
                 borderRadius: 1,
                 opacity: 0.6,
                 backgroundSize: '200% 200%',

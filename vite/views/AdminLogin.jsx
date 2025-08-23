@@ -26,7 +26,7 @@ import {
   Lock
 } from '@mui/icons-material';
 import Lottie from 'lottie-react';
-import verificationAnimation from '/public/verification-animation.json';
+import verificationAnimation from '/public/red-blob.json';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { useDataLayer } from '../Context/DataLayer';
 import { useTheme } from '../Context/ThemeContext';
@@ -435,7 +435,7 @@ const AdminLogin = () => {
             left: '2%',
             width: 120,
             height: 120,
-            background: gradients.multiGradient,
+            background: gradients.primaryGradient,
             borderRadius: '50%',
             opacity: 0.25,
             animation: 'adminPulse 7s ease-in-out infinite 1s',
@@ -530,7 +530,7 @@ const AdminLogin = () => {
                     filter: 'drop-shadow(0 2px 4px rgba(246, 81, 30, 0.5))',
                   }}
                 >
-                  Buster & Co.
+                  BlackCore AI
                 </Typography>
               </Box>
               
@@ -556,7 +556,7 @@ const AdminLogin = () => {
                       left: -6,
                       right: -6,
                       bottom: -6,
-                      background: gradients.multiGradient,
+                      background: gradients.primaryGradient,
                       borderRadius: '50%',
                       opacity: 0.3,
                       animation: 'adminIconGlow 3s ease-in-out infinite',
@@ -879,7 +879,7 @@ const AdminLogin = () => {
                     size="large"
                     disabled={isLoading}
                     sx={{
-                      background: gradients.multiGradient,
+                      background: gradients.primaryGradient,
                       backgroundSize: '200% 200%',
                       color: '#ffffff',
                       py: 2,
@@ -948,7 +948,7 @@ const AdminLogin = () => {
                   fontFamily: fonts.body,
                 }}
               >
-                Contact: support@busterandco.com | (555) 123-4567
+                Contact: support@blackcoreai.com | (415) 555-0100
               </Typography>
             </Box>
 
@@ -957,7 +957,7 @@ const AdminLogin = () => {
               sx={{
                 mt: 4,
                 height: 2,
-                background: gradients.multiGradient,
+                background: gradients.primaryGradient,
                 borderRadius: 1,
                 opacity: 0.6,
                 backgroundSize: '200% 200%',
