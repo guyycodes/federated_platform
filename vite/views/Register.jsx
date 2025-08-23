@@ -33,16 +33,36 @@ import Lottie from 'lottie-react';
 import verificationAnimation from '/public/verification-animation.json';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CheckIcon from '@mui/icons-material/Check';
-import PetsIcon from '@mui/icons-material/Pets';
+import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import HeaderBar from '../Components/ui/HeaderBar';
 import Footer from '../Components/ui/Footer';
 import ChatBot from '../Components/ui/ChatBot';
 import GoogleRegister from '../Components/ui/GoogleRegister';
 import { useDataLayer } from '../Context/DataLayer';
-import { membershipPlans, oneTimeServices, sizeCategories, getPriceBySize } from '../assets/pricing/membershipPlans';
+import { membershipPlans, billingPeriods, getPriceByPeriod } from '../assets/pricing/membershipPlans';
 import { useSignUp } from '@clerk/clerk-react';
 import { useTheme } from '../Context/ThemeContext';
+
+/**
+ * Register Component - Invite-Only Registration System
+ * 
+ * This registration page requires a valid invitation link to access.
+ * Users must receive an invitation email with a time-limited token (72 hours).
+ * 
+ * INVITE URL PATTERN:
+ * https://yourdomain.com/register?invite={token}&email={urlEncodedEmail}
+ * 
+ * Example:
+ * https://app.blackcoreai.com/register?invite=eyJhbGciOiJIUzI1NiIs...&email=john.doe%40company.com
+ * 
+ * The invite token should contain:
+ * - Unique identifier
+ * - Email address (to pre-fill and lock the email field)
+ * - Expiration timestamp (72 hours from creation)
+ * 
+ * Invalid or expired tokens will show appropriate error messages.
+ */
 
 // TextField styling with glassmorphism theme - moved inside component to access theme
 const getTextFieldStyling = (colors) => ({
@@ -91,15 +111,21 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [selectedSize, setSelectedSize] = useState('small');
-  const [serviceType, setServiceType] = useState('membership'); // 'membership' or 'one-time'
+  const [billingPeriod, setBillingPeriod] = useState('annual');
   const [localError, setLocalError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionMessage, setTransitionMessage] = useState('');
+  const [inviteStatus, setInviteStatus] = useState('checking'); // 'checking', 'valid', 'invalid', 'expired'
+  const [inviteEmail, setInviteEmail] = useState(''); // Pre-filled email from invite
   const navigate = useNavigate();
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
   const scrollPositionRef = useRef(0);
+  
+  // INVITE URL PATTERN FOR EMAIL:
+  // https://yourdomain.com/register?invite={token}&email={urlEncodedEmail}
+  // Example: https://yourdomain.com/register?invite=eyJhbGciOiJIUzI1NiIs...&email=john.doe%40company.com
+  // Token should be a JWT or unique ID that contains expiration timestamp
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -109,25 +135,65 @@ const Register = () => {
       history.scrollRestoration = 'manual';
     }
     
+    // Check for invite token in URL
+    const queryParams = new URLSearchParams(location.search);
+    const inviteToken = queryParams.get('invite');
+    const emailFromInvite = queryParams.get('email');
+    
+    // Validate invite token
+    const validateInviteToken = async () => {
+      if (!inviteToken) {
+        setInviteStatus('invalid');
+        return;
+      }
+      
+      try {
+        // Validate token with backend
+        const response = await fetch(`/api/auth/validate-invite?token=${inviteToken}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Check if token is expired (72 hour window)
+          const tokenExpiry = new Date(data.expiresAt);
+          const now = new Date();
+          
+          if (now > tokenExpiry) {
+            setInviteStatus('expired');
+          } else {
+            setInviteStatus('valid');
+            // Pre-fill email if provided
+            if (emailFromInvite) {
+              setInviteEmail(decodeURIComponent(emailFromInvite));
+              setFormData(prev => ({
+                ...prev,
+                email: decodeURIComponent(emailFromInvite)
+              }));
+            }
+          }
+        } else {
+          setInviteStatus('invalid');
+        }
+      } catch (error) {
+        console.error('Error validating invite token:', error);
+        setInviteStatus('invalid');
+      }
+    };
+    
+    validateInviteToken();
+    
     // Check for plan from state or query params
     const planFromState = location.state?.plan;
-    const queryParams = new URLSearchParams(location.search);
     const fromPath = location.state?.from || queryParams.get('from');
     
     // Set selected plan from context if available
     if (currentPlan) {
-      // Extract the selectedSize from currentPlan if available
-      const sizeFromContext = currentPlan.selectedSize || 'small';
-      setSelectedSize(sizeFromContext); // Set the size state
-      
       setSelectedPlan({
         planId: currentPlan.id,
         planTitle: currentPlan.title,
         planType: 'provider', // Default for subscription plans
-        price: getPriceBySize(currentPlan, sizeFromContext), // Use the extracted size
-        isAnnual: false, // Default to monthly
-        serviceType: 'membership', // Default to membership
-        selectedSize: sizeFromContext // Include the size in the selectedPlan
+        price: getPriceByPeriod(currentPlan, billingPeriod),
+        billingPeriod: billingPeriod
       });
     }
     // Or from route state/params
@@ -138,10 +204,8 @@ const Register = () => {
           planId: plan.id,
           planTitle: plan.title,
           planType: 'provider',
-          isAnnual: false,
-          price: getPriceBySize(plan, selectedSize),
-          serviceType: 'membership',
-          selectedSize: selectedSize
+          billingPeriod: billingPeriod,
+          price: getPriceByPeriod(plan, billingPeriod)
         });
       }
     }
@@ -236,29 +300,27 @@ const Register = () => {
     
     // Validate plan selection
     // if (!selectedPlan) {
-    //   newErrors.plan = serviceType === 'membership' 
-    //     ? 'Please select a membership plan' 
-    //     : 'Please select a service';
+    //   newErrors.plan = 'Please select a license plan';
     // }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSizeChange = (event, newSize) => {
+  const handleBillingChange = (event, newPeriod) => {
     // Save current scroll position
     scrollPositionRef.current = window.scrollY;
     
-    if (newSize !== null) {
-      setSelectedSize(newSize);
+    if (newPeriod !== null) {
+      setBillingPeriod(newPeriod);
       // Update selected plan price if a plan is already selected
       if (selectedPlan) {
-        const services = serviceType === 'membership' ? membershipPlans : oneTimeServices;
-        const service = services.find(s => s.id === selectedPlan.planId);
-        if (service) {
+        const plan = membershipPlans.find(p => p.id === selectedPlan.planId);
+        if (plan) {
           setSelectedPlan(prev => ({
             ...prev,
-            price: getPriceBySize(service, newSize)
+            price: getPriceByPeriod(plan, newPeriod),
+            billingPeriod: newPeriod
           }));
         }
       }
@@ -270,38 +332,15 @@ const Register = () => {
     }
   };
 
-  const handleServiceTypeChange = (event, newType) => {
-    // Save current scroll position
-    scrollPositionRef.current = window.scrollY;
-    
-    if (newType !== null) {
-      setServiceType(newType);
-      // Clear selected plan when switching service types
-      setSelectedPlan(null);
-      // Clear any plan selection errors
-      if (errors.plan) {
-        setErrors(prev => ({
-          ...prev,
-          plan: ''
-        }));
-      }
-      
-      // Restore scroll position after state update
-      setTimeout(() => {
-        window.scrollTo(0, scrollPositionRef.current);
-      }, 0);
-    }
-  };
+
 
   const handlePlanSelect = (plan) => {
     setSelectedPlan({
       planId: plan.id,
       planTitle: plan.title,
-      planType: serviceType === 'membership' ? 'provider' : 'one-time',
-      isAnnual: false,
-      price: getPriceBySize(plan, selectedSize),
-      selectedSize: selectedSize,
-      serviceType: serviceType
+      planType: 'provider',
+      billingPeriod: billingPeriod,
+      price: getPriceByPeriod(plan, billingPeriod)
     });
   };
   
@@ -327,12 +366,7 @@ const Register = () => {
     return `+${cleaned}`;
   };
 
-  const handleCheckoutOnly = () => {
-    // Navigate directly to booking for one-time services without registration
-    if (selectedPlan && selectedPlan.serviceType === 'one-time') {
-      navigate(`/book-appointment?service=${selectedPlan.planId}&size=${selectedPlan.selectedSize}&checkout=true`);
-    }
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -422,6 +456,8 @@ const Register = () => {
                   lastName,
                   email,
                   phone,
+                  // Include invite token to track invitation usage
+                  inviteToken: new URLSearchParams(location.search).get('invite'),
                   // locationId is now optional - will be set later when user selects a location
                 }),
               });
@@ -457,7 +493,7 @@ const Register = () => {
               sessionStorage.setItem('selectedPlan', JSON.stringify(selectedPlan));
               setTransitionMessage('Preparing your dashboard...');
             } else {
-              setTransitionMessage('Welcome to Buster & Co!');
+              setTransitionMessage('Welcome to BlackCore AI!');
             }
             
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -542,6 +578,8 @@ const Register = () => {
                   lastName,
                   email,
                   phone,
+                  // Include invite token to track invitation usage
+                  inviteToken: new URLSearchParams(location.search).get('invite'),
                   // locationId is now optional - will be set later when user selects a location
                 }),
               });
@@ -573,7 +611,7 @@ const Register = () => {
               sessionStorage.setItem('selectedPlan', JSON.stringify(selectedPlan));
               setTransitionMessage('Preparing your dashboard...');
             } else {
-              setTransitionMessage('Welcome to Buster & Co!');
+              setTransitionMessage('Welcome to BlackCore AI!');
             }
             
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -698,6 +736,84 @@ const Register = () => {
         }}
       >
         <Container maxWidth="md">
+          {/* Invite Token Validation States */}
+          {inviteStatus === 'checking' && (
+            <Paper 
+              elevation={0} 
+              sx={{ 
+                p: 6,
+                borderRadius: 3,
+                background: alpha(colors.glassWhite, 0.1),
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                boxShadow: `0 8px 32px ${alpha(colors.primary, 0.2)}`,
+                textAlign: 'center',
+              }}
+            >
+              <CircularProgress size={48} sx={{ color: colors.accent, mb: 3 }} />
+              <Typography variant="h5" sx={{ color: '#ffffff', mb: 2 }}>
+                Validating Your Invitation
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                Please wait while we verify your access...
+              </Typography>
+            </Paper>
+          )}
+          
+          {inviteStatus === 'invalid' && (
+            <Paper 
+              elevation={0} 
+              sx={{ 
+                p: 6,
+                borderRadius: 3,
+                background: alpha(colors.glassWhite, 0.1),
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${alpha(colors.accent, 0.3)}`,
+                boxShadow: `0 8px 32px ${alpha(colors.accent, 0.2)}`,
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="h4" sx={{ color: colors.accent, mb: 2 }}>
+                Invalid Invitation Link
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#ffffff', mb: 4 }}>
+                This registration link is invalid or has not been recognized. 
+                Registration is by invitation only.
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                If you believe this is an error, please contact your administrator for a new invitation.
+              </Typography>
+            </Paper>
+          )}
+          
+          {inviteStatus === 'expired' && (
+            <Paper 
+              elevation={0} 
+              sx={{ 
+                p: 6,
+                borderRadius: 3,
+                background: alpha(colors.glassWhite, 0.1),
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${alpha(colors.accent, 0.3)}`,
+                boxShadow: `0 8px 32px ${alpha(colors.accent, 0.2)}`,
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="h4" sx={{ color: colors.accent, mb: 2 }}>
+                Invitation Link Expired
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#ffffff', mb: 4 }}>
+                This invitation link has expired. Invitation links are valid for 72 hours from the time they are sent.
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                Please contact your administrator to receive a new invitation link.
+              </Typography>
+            </Paper>
+          )}
+          
+          {/* Only show the registration form if invite is valid */}
+          {inviteStatus === 'valid' && (
+            <>
           {/* Enhanced Transition overlay with glassmorphism */}
           {isTransitioning && (
             <Box
@@ -935,7 +1051,7 @@ const Register = () => {
                     filter: 'drop-shadow(0 2px 4px rgba(246, 81, 30, 0.5))',
                   }}
                 >
-                  Buster & Co.
+                  BlackCore AI
                 </Typography>
               </Box>
               <Typography 
@@ -952,11 +1068,25 @@ const Register = () => {
               </Typography>
               <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
                 {selectedPlan 
-                  ? selectedPlan.serviceType === 'one-time'
-                    ? `Complete registration for ${selectedPlan.planTitle} service`
-                    : `Complete your ${selectedPlan.planTitle} membership registration`
-                  : 'Choose a service option to continue'}
+                  ? `Complete your ${selectedPlan.planTitle} registration`
+                  : 'Choose a license plan to continue'}
               </Typography>
+              
+              {/* Show invite badge if using invitation link */}
+              {inviteEmail && (
+                <Chip
+                  icon={<CheckIcon />}
+                  label="Invitation Verified"
+                  size="small"
+                  sx={{
+                    mt: 2,
+                    background: alpha(colors.lottieGreen, 0.2),
+                    color: colors.lottieGreen,
+                    border: `1px solid ${alpha(colors.lottieGreen, 0.4)}`,
+                    fontWeight: 'medium',
+                  }}
+                />
+              )}
               
               {selectedPlan ? (
                 <Box 
@@ -994,15 +1124,15 @@ const Register = () => {
                   
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
                     <ShoppingCartIcon sx={{ color: colors.accent, mr: 1, filter: 'drop-shadow(0 2px 4px rgba(0,255,255,0.3))' }} />
-                    <Typography variant="body1" fontWeight="bold" sx={{ color: '#ffffff' }}>
-                      Selected {selectedPlan.serviceType === 'one-time' ? 'Service' : 'Plan'}
-                    </Typography>
+                                      <Typography variant="body1" fontWeight="bold" sx={{ color: '#ffffff' }}>
+                    Selected License Plan
+                  </Typography>
                   </Box>
                   <Typography variant="body2" gutterBottom component="div" sx={{ color: '#ffffff' }}>
-                    {selectedPlan.planTitle} - {sizeCategories[selectedSize]?.label} Dog
+                    {selectedPlan.planTitle}
                     <Chip 
                       size="small" 
-                      label={selectedPlan.serviceType === 'one-time' ? selectedPlan.price : selectedPlan.price + '/month'}
+                      label={selectedPlan.price + (billingPeriod === 'monthly' ? '/month' : '/year')}
                       sx={{ 
                         ml: 1, 
                         background: gradients.accentGradient,
@@ -1014,53 +1144,22 @@ const Register = () => {
                     />
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                    {selectedPlan.serviceType === 'one-time' 
-                      ? 'Complete registration to book your appointment, or checkout as guest'
-                      : 'Complete your registration to continue to checkout'}
+                    Complete your registration to continue to checkout
                   </Typography>
-                  
-                  {/* Checkout Only Button - Only show for one-time services */}
-                  {selectedPlan.serviceType === 'one-time' && (
-                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                      <Button
-                        onClick={handleCheckoutOnly}
-                        variant="outlined"
-                        size="small"
-                        sx={{
-                          borderColor: colors.accent,
-                          color: colors.accent,
-                          fontSize: '0.875rem',
-                          px: 3,
-                          py: 1,
-                          backdropFilter: 'blur(10px)',
-                          fontWeight: 'bold',
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            background: alpha(colors.accent, 0.1),
-                            borderColor: colors.accent,
-                            transform: 'translateY(-2px)',
-                            boxShadow: `0 4px 20px ${alpha(colors.accent, 0.3)}`,
-                          },
-                        }}
-                      >
-                        Checkout as Guest
-                      </Button>
-                    </Box>
-                  )}
                 </Box>
               ) : (
-                // Display service type selection, dog size selection and plan selection when no plan is selected
+                // Display plan selection when no plan is selected
                 <Box sx={{ mt: 4, mb: 3 }}>
-                  {/* Service Type Selection */}
-                  <Typography variant="body1" fontWeight="medium" sx={{ mb: 2, color: '#ffffff' }}>
-                    Choose service type:
+                  {/* Billing Period Selection */}
+                  <Typography variant="body1" fontWeight="medium" sx={{ my: 2, color: '#ffffff' }}>
+                    Select billing period:
                   </Typography>
                   <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
                     <ToggleButtonGroup
-                      value={serviceType}
+                      value={billingPeriod}
                       exclusive
-                      onChange={handleServiceTypeChange}
-                      aria-label="service type selection"
+                      onChange={handleBillingChange}
+                      aria-label="billing period selection"
                       orientation={isMobile ? 'vertical' : 'horizontal'}
                       sx={{
                         background: alpha(colors.glassWhite, 0.05),
@@ -1072,20 +1171,20 @@ const Register = () => {
                           color: 'rgba(255,255,255,0.8)',
                           borderColor: alpha(colors.primary, 0.2),
                           backgroundColor: 'transparent',
-                          px: { xs: 2, sm: 4 },
+                          px: { xs: 2, sm: 3 },
                           py: { xs: 1, sm: 1.5 },
-                          fontSize: { xs: '0.9rem', sm: '1rem' },
-                          minWidth: { xs: '160px', sm: 'auto' },
+                          fontSize: { xs: '0.8rem', sm: '1rem' },
+                          minWidth: { xs: '120px', sm: 'auto' },
                           transition: 'all 0.3s ease',
                           '&:hover': {
-                            backgroundColor: alpha(colors.primary, 0.1),
+                            backgroundColor: alpha(colors.accent, 0.1),
                             transform: 'translateY(-1px)',
                           },
                           '&.Mui-selected': {
-                            background: gradients.primaryGradient,
+                            background: gradients.accentGradient,
                             color: 'white',
                             '&:hover': {
-                              background: gradients.primaryGradient,
+                              background: gradients.accentGradient,
                               filter: 'brightness(1.1)',
                             }
                           },
@@ -1095,20 +1194,35 @@ const Register = () => {
                         }
                       }}
                     >
-                      <ToggleButton value="membership" type="button">
-                        Monthly Plans
-                      </ToggleButton>
-                      <ToggleButton value="one-time" type="button">
-                        One-time Services
-                      </ToggleButton>
+                      {Object.entries(billingPeriods).map(([key, period]) => (
+                        <ToggleButton 
+                          key={key}
+                          value={key}
+                          type="button"
+                          disableFocusRipple
+                          disableRipple
+                        >
+                          <CalendarViewMonthIcon sx={{ 
+                            mr: { xs: 0.5, sm: 1 }, 
+                            fontSize: { xs: '1rem', sm: '1.2rem' },
+                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                          }} />
+                          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                              {period.label}
+                            </Typography>
+                            <Typography variant="caption" sx={{ ml: { xs: 0, sm: 0.5 }, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                              ({period.description})
+                            </Typography>
+                          </Box>
+                        </ToggleButton>
+                      ))}
                     </ToggleButtonGroup>
                   </Box>
 
-                  
-
-                  {/* Plan/Service Selection */}
+                  {/* Plan Selection */}
                   <Typography variant="body1" fontWeight="medium" sx={{ mb: 2, color: '#ffffff' }}>
-                    {serviceType === 'membership' ? 'Select a membership plan:' : 'Select a service:'}
+                    Select a license plan:
                   </Typography>
                   {errors.plan && (
                     <Typography 
@@ -1124,8 +1238,8 @@ const Register = () => {
                     </Typography>
                   )}
                   <Grid container spacing={2} justifyContent="center">
-                    {(serviceType === 'membership' ? membershipPlans : oneTimeServices).map((plan) => (
-                      <Grid size={{ xs: 12, sm: serviceType === 'membership' ? 4 : 6}} key={plan.id}>
+                    {membershipPlans.map((plan) => (
+                      <Grid size={{ xs: 12, sm: 4}} key={plan.id}>
                         <Card 
                           onClick={() => handlePlanSelect(plan)}
                           sx={{ 
@@ -1135,10 +1249,10 @@ const Register = () => {
                             flexDirection: 'column',
                             background: alpha(colors.glassWhite, 0.1),
                             backdropFilter: 'blur(20px)',
-                            border: (serviceType === 'membership' && plan.popularFeature) 
+                            border: plan.popularFeature 
                               ? `2px solid ${colors.accent}` 
                               : `1px solid ${alpha(colors.primary, 0.2)}`,
-                            boxShadow: (serviceType === 'membership' && plan.popularFeature)
+                            boxShadow: plan.popularFeature
                               ? `0 8px 32px ${alpha(colors.accent, 0.3)}`
                               : `0 4px 20px ${alpha(colors.primary, 0.2)}`,
                             borderRadius: 3,
@@ -1168,7 +1282,7 @@ const Register = () => {
                             }
                           }}
                         >
-                          {(serviceType === 'membership' && plan.popularFeature) && (
+                          {plan.popularFeature && (
                             <Chip
                               label="Most Popular"
                               size="small"
@@ -1214,10 +1328,10 @@ const Register = () => {
                                   WebkitTextFillColor: 'transparent',
                                 }}
                               >
-                                {getPriceBySize(plan, selectedSize)}
+                                {getPriceByPeriod(plan, billingPeriod)}
                               </Typography>
                               <Typography variant="caption" sx={{ ml: 0.5, color: 'rgba(255,255,255,0.7)' }}>
-                                {serviceType === 'membership' ? plan.period : ''}
+                                {plan.period[billingPeriod]}
                               </Typography>
                             </Box>
                             <Typography variant="body2" sx={{ mb: 2, fontSize: '0.875rem', color: 'rgba(255,255,255,0.8)' }}>
@@ -1250,76 +1364,6 @@ const Register = () => {
                       </Grid>
                     ))}
                   </Grid>
-                  {/* Dog Size Selection */}
-                  <Typography variant="body1" fontWeight="medium" sx={{ my: 2, color: '#ffffff' }}>
-                    Select your dog's size:
-                  </Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-                    <ToggleButtonGroup
-                      value={selectedSize}
-                      exclusive
-                      onChange={handleSizeChange}
-                      aria-label="dog size selection"
-                      orientation={isMobile ? 'vertical' : 'horizontal'}
-                      sx={{
-                        background: alpha(colors.glassWhite, 0.05),
-                        backdropFilter: 'blur(10px)',
-                        borderRadius: 3,
-                        border: `1px solid ${alpha(colors.primary, 0.2)}`,
-                        flexDirection: isMobile ? 'column' : 'row',
-                        '& .MuiToggleButton-root': {
-                          color: 'rgba(255,255,255,0.8)',
-                          borderColor: alpha(colors.primary, 0.2),
-                          backgroundColor: 'transparent',
-                          px: { xs: 2, sm: 3 },
-                          py: { xs: 1, sm: 1.5 },
-                          fontSize: { xs: '0.8rem', sm: '1rem' },
-                          minWidth: { xs: '120px', sm: 'auto' },
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            backgroundColor: alpha(colors.accent, 0.1),
-                            transform: 'translateY(-1px)',
-                          },
-                          '&.Mui-selected': {
-                            background: gradients.accentGradient,
-                            color: 'white',
-                            '&:hover': {
-                              background: gradients.accentGradient,
-                              filter: 'brightness(1.1)',
-                            }
-                          },
-                          '&:focus': {
-                            outline: 'none',
-                          }
-                        }
-                      }}
-                    >
-                      {Object.entries(sizeCategories).map(([key, category]) => (
-                        <ToggleButton 
-                          key={key}
-                          value={key}
-                          type="button"
-                          // keeps the screen from flickerng when the weird scroll problem occurs on state update
-                          disableFocusRipple
-                          disableRipple
-                        >
-                          <PetsIcon sx={{ 
-                            mr: { xs: 0.5, sm: 1 }, 
-                            fontSize: { xs: '1rem', sm: '1.2rem' },
-                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                          }} />
-                          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center' }}>
-                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                              {category.label}
-                            </Typography>
-                            <Typography variant="caption" sx={{ ml: { xs: 0, sm: 0.5 }, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
-                              ({category.description})
-                            </Typography>
-                          </Box>
-                        </ToggleButton>
-                      ))}
-                    </ToggleButtonGroup>
-                  </Box>
                 </Box>
               )}
             </Box>
@@ -1393,9 +1437,20 @@ const Register = () => {
                     value={formData.email}
                     onChange={handleChange}
                     error={!!errors.email}
-                    helperText={errors.email}
-                    disabled={isLoading}
-                    sx={textFieldStyling}
+                    helperText={errors.email || (inviteEmail ? 'Email address from your invitation' : '')}
+                    disabled={isLoading || !!inviteEmail} // Disable if email came from invite
+                    InputProps={{
+                      readOnly: !!inviteEmail, // Make read-only if from invite
+                    }}
+                    sx={{
+                      ...textFieldStyling,
+                      ...(inviteEmail && {
+                        '& .MuiOutlinedInput-root': {
+                          ...textFieldStyling['& .MuiOutlinedInput-root'],
+                          backgroundColor: alpha(colors.primary, 0.05),
+                        }
+                      })
+                    }}
                   />
                 </Grid>
                 
@@ -1611,11 +1666,9 @@ const Register = () => {
                         <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
                         Creating Account...
                       </Box>
-                    ) : selectedPlan?.serviceType === 'one-time' 
-                        ? 'Create Account & Book Appointment' 
-                        : selectedPlan?.serviceType === 'membership' 
-                          ? 'Create Your Account & Checkout' 
-                          : 'Create Account'}
+                    ) : selectedPlan 
+                        ? 'Create Your Account & Checkout' 
+                        : 'Create Account'}
                   </Button>
                 </Grid>
               </Grid>
@@ -1716,6 +1769,8 @@ const Register = () => {
               ← Back to Home
             </Button>
           </Box>
+            </>
+          )}
         </Container>
       </Box>
       

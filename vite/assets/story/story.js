@@ -1,107 +1,139 @@
 const story = {
   hero: {
-    title: "About Buster & Co.",
-    subtitle: "Born from loss, built on love—bringing professional pet grooming to your home with care.",
-    backgroundImage: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1350&q=80"
+    title: "About BlackCore AI",
+    subtitle: "Revolutionizing audit processes with AI-first automation, reducing audit time by 60-80% while maintaining compliance excellence.",
+    backgroundImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1350&q=80"
   },
   sections: [
     {
-      id: "our-story",
-      title: "Our Story",
-      image: "https://images.unsplash.com/photo-1551717743-49959800b1f6?auto=format&fit=crop&w=1350&q=80",
-      imageAlt: "Happy dog being groomed",
+      id: "our-company",
+      title: "About the Company",
+      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1350&q=80",
+      imageAlt: "Modern office with team collaboration",
       content: [
         {
           type: "paragraph",
-          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+          text: "BlackCore AI is transforming the audit industry through cutting-edge artificial intelligence and automation. Founded by industry veterans who saw the inefficiencies in traditional audit processes, we've built a platform that revolutionizes how audits are conducted.",
           style: "secondary"
         },
         {
           type: "paragraph",
-          text: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.",
-          style: "secondary"
-        },
-        {
-          type: "paragraph",
-          text: "Lorem ipsum foundation principle.",
+          text: "Our mission: Eliminate 60-80% of manual audit work through intelligent automation.",
           style: "primary-bold"
         },
         {
           type: "paragraph",
-          text: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.",
+          text: "We serve both internal and external audit teams across federal, commercial, and international frameworks. Our AI-powered platform handles everything from audit work program generation to evidence collection, testing, and report drafting - allowing auditors to focus on high-value review and strategic insights.",
           style: "secondary"
         },
         {
           type: "paragraph",
-          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua deserunt.",
+          text: "With deep expertise in compliance frameworks like SOX, FISMA, NIST, HIPAA, and ISO standards, BlackCore AI ensures that automation doesn't compromise quality. Instead, it enhances consistency, reduces human error, and accelerates time to completion.",
           style: "secondary"
         }
       ]
     },
     {
-      id: "the-vision",
-      title: "The Vision",
-      image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1350&q=80",
-      imageAlt: "pet with a shirt on",
+      id: "our-product",
+      title: "About the Product",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1350&q=80",
+      imageAlt: "AI-powered audit dashboard",
       imagePosition: "left",
       content: [
         {
           type: "paragraph",
-          text: "Serve family; cultivate happiness, unconditionally.",
+          text: "Two Powerful Domains. One Revolutionary Platform.",
           style: "primary-bold"
         },
         {
           type: "paragraph",
-          text: "Deliver professional, stress-free grooming directly to families'. Premium care delivered with compassion and convenience.",
+          text: "BlackCore AI offers comprehensive audit automation through two specialized domains - Internal Audit and External Audit - each with modules tailored to specific compliance frameworks and industries.",
           style: "secondary"
         },
         {
           type: "paragraph",
-          text: "Buster & Co. was born from loss but built on love—honoring the memory of a loyal companion while helping other pets live their happiest lives.",
+          text: "Internal Audit Domain: Autonomous testing of internal controls, risk assessments, and compliance frameworks. Features automated AWP generation, PBC list creation, walkthrough automation, and AI-powered report generation.",
+          style: "secondary"
+        },
+        {
+          type: "paragraph",
+          text: "External Audit Domain: AI-first preparation with auditor-as-reviewer workflow. BlackCore performs all scoping, testing, and documentation while auditors focus on review and sign-off, achieving 60-80% time reduction.",
+          style: "secondary"
+        },
+        {
+          type: "paragraph",
+          text: "Supporting Federal (FISMA, NIST, FedRAMP), Commercial (SOX, HIPAA, PCI DSS), and International frameworks with intelligent, framework-specific automation.",
           style: "primary-bold"
-        },
-        {
-          type: "paragraph",
-          text: "Every tail we wag, every perfect coat, every family; carries Buster's memory of unconditional love & that feeling you get when someone makes you feel special; unconditionally",
-          style: "secondary"
         }
       ]
     }
   ],
-  memorial: {
-    title: "Honoring Buster's Memory",
-    content: "Every service is a tribute to the unconditional love & joy that pets bring to life."
+  team: {
+    title: "Leadership Team",
+    subtitle: "Visionaries driving the future of automated auditing",
+    members: [
+      {
+        id: "ceo",
+        name: "John Smith",
+        role: "Chief Executive Officer",
+        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80",
+        bio: "With over 20 years in audit and compliance, John founded BlackCore AI after witnessing countless hours wasted on manual processes. His vision of AI-augmented auditing has attracted top talent and major enterprise & Federal clients.",
+        primary: true
+      },
+      {
+        id: "caio",
+        name: "Sarah Chen",
+        role: "Chief AI Officer",
+        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+        bio: "Former researcher assistant in Munich, Masters in NLP from .... Sarah leads our AI innovation, ensuring BlackCore stays at the cutting edge of automation technology."
+      },
+      {
+        id: "cto",
+        name: "Michael Rodriguez",
+        role: "Chief Technology Officer",
+        image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80",
+        bio: "Previously CTO at a Big Four audit firm's innovation lab. Michael architects our scalable, secure platform that processes millions of audit documents daily."
+      },
+      {
+        id: "chief-engineer",
+        name: "Coming Soon",
+        role: "Chief Engineer",
+        image: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=400&q=80",
+        bio: "We're searching for an exceptional engineering leader to drive our technical excellence forward. Join us in revolutionizing the audit industry.",
+        placeholder: true
+      }
+    ]
   },
   values: [
     {
-      id: "compassionate-care",
-      title: "Compassionate Care",
-      description: "Every pet receives gentle, loving attention in the comfort of their own home.",
-      icon: "favorite",
-      color: "lottieGreen"
+      id: "automation-first",
+      title: "Automation First",
+      description: "We believe repetitive audit tasks should be automated, freeing professionals for strategic work.",
+      icon: "settings",
+      color: "primary"
     },
     {
-      id: "stress-free-service",
-      title: "Stress-Free Service",
-      description: "No car rides, no unfamiliar places—just premium grooming at your doorstep.",
-      icon: "home",
-      color: "lottieTeal"
+      id: "accuracy-assured",
+      title: "Accuracy Assured",
+      description: "AI-powered consistency and precision that exceeds human capabilities in routine testing.",
+      icon: "verified",
+      color: "accent"
     },
     {
-      id: "professional-excellence",
-      title: "Professional Excellence",
-      description: "Years of experience and genuine love for animals.",
-      icon: "pets",
-      color: "lottieGreen"
+      id: "compliance-focused",
+      title: "Compliance Focused",
+      description: "Deep expertise in regulatory frameworks ensures automation meets all standards.",
+      icon: "shield",
+      color: "primary"
     },
     {
-      id: "family-first",
-      title: "Family First",
-      description: "We treat every pet as family because we understand the bond you share.",
-      icon: "star",
-      color: "lottieTeal"
+      id: "time-optimized",
+      title: "Time Optimized",
+      description: "60-80% reduction in audit time through intelligent process automation.",
+      icon: "schedule",
+      color: "accent"
     }
   ]
 };
 
-export default story; 
+export default story;

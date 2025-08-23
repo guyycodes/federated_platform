@@ -9,14 +9,22 @@ import {
   Link,
   Divider,
   Paper,
-  alpha
+  alpha,
+  Chip
 } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import HomeIcon from '@mui/icons-material/Home';
-import PetsIcon from '@mui/icons-material/Pets';
-import StarIcon from '@mui/icons-material/Star';
-import { Star, Bolt, TrendingUp } from '@mui/icons-material';
+
+import { 
+  NavigateNext as NavigateNextIcon, 
+  Favorite as FavoriteIcon, 
+  Home as HomeIcon, 
+  Pets as PetsIcon, 
+  Star, 
+  Settings, 
+  VerifiedUser, 
+  Shield, 
+  Schedule, 
+  Assessment 
+} from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import HeaderBar from '../Components/ui/HeaderBar';
 import Footer from '../Components/ui/Footer';
@@ -112,8 +120,16 @@ const About = () => {
         return <PetsIcon sx={iconProps} />;
       case 'star':
         return <StarIcon sx={iconProps} />;
+      case 'settings':
+        return <Settings sx={iconProps} />;
+      case 'verified':
+        return <VerifiedUser sx={iconProps} />;
+      case 'shield':
+        return <Shield sx={iconProps} />;
+      case 'schedule':
+        return <Schedule sx={iconProps} />;
       default:
-        return <PetsIcon sx={iconProps} />;
+        return <Settings sx={iconProps} />;
     }
   };
 
@@ -504,70 +520,287 @@ const About = () => {
             </div>
           ))}
 
-          {/* Enhanced Memorial Section */}
-          <Paper
-            elevation={0}
-            sx={{
-              background: `linear-gradient(135deg, ${colors.lottieGreen}, ${colors.accent})`,
-              color: '#ffffff',
-              borderRadius: 3,
-              p: 4,
-              mt: 4,
-              textAlign: 'center',
-              position: 'relative',
-              overflow: 'hidden',
-              border: `2px solid ${alpha('#ffffff', 0.3)}`,
-              boxShadow: `0 8px 32px ${alpha(colors.lottieGreen, 0.4)}`,
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: `0 12px 40px ${alpha(colors.lottieGreen, 0.6)}`,
-              },
-              transition: 'all 0.3s ease',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: '-100%',
-                width: '100%',
-                height: '100%',
-                background: gradients.shimmerGradient,
-                animation: 'shimmer 3s ease-in-out infinite',
-                '@keyframes shimmer': {
-                  '0%': { left: '-100%' },
-                  '100%': { left: '100%' },
-                },
-              },
-            }}
-          >
-            <Box sx={{ position: 'relative', zIndex: 2 }}>
+          {/* Team Section */}
+          <Box sx={{ mt: 8, mb: 8 }}>
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
-                <Star sx={{ fontSize: 24, color: '#ffffff' }} />
+                <Star sx={{ fontSize: 28, color: colors.primary }} />
                 <Typography 
-                  variant="h5" 
+                  variant="h3" 
+                  component="h2" 
                   sx={{
                     fontWeight: 'bold',
                     fontFamily: fonts.heading,
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    background: gradients.multiGradient,
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.3))',
                   }}
                 >
-                  {story.memorial.title}
+                  {story.team.title}
                 </Typography>
-                <Star sx={{ fontSize: 24, color: '#ffffff' }} />
+                <Star sx={{ fontSize: 28, color: colors.accent }} />
               </Box>
               <Typography 
                 variant="body1" 
                 sx={{ 
-                  maxWidth: 600, 
-                  mx: 'auto',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  color: alpha('#ffffff', 0.8),
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                   fontFamily: fonts.body,
-                  lineHeight: 1.6,
+                  maxWidth: 800,
+                  mx: 'auto',
                 }}
               >
-                {story.memorial.content}
+                {story.team.subtitle}
               </Typography>
             </Box>
-          </Paper>
+
+            <Grid container spacing={4}>
+              {story.team.members.map((member, index) => (
+                <Grid 
+                  size={{ xs: 12, md: member.primary ? 12 : 6, lg: member.primary ? 12 : 4 }} 
+                  key={member.id}
+                >
+                  <div
+                    ref={el => sectionRefs.current[member.id] = el}
+                    data-section-id={member.id}
+                  >
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 4,
+                      background: alpha(colors.glassWhite, 0.1),
+                      backdropFilter: 'blur(20px)',
+                      border: `1px solid ${alpha(member.primary ? colors.primary : colors.accent, 0.3)}`,
+                      borderRadius: 3,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      opacity: visibleSections[member.id] ? 1 : 0,
+                      transform: visibleSections[member.id] ? 'translateY(0)' : 'translateY(30px)',
+                      transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                      transitionDelay: `${index * 0.2}s`,
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: `0 16px 48px ${alpha(member.primary ? colors.primary : colors.accent, 0.3)}`,
+                        border: `1px solid ${alpha(member.primary ? colors.primary : colors.accent, 0.5)}`,
+                      },
+                    }}
+                  >
+                    <Grid container spacing={4} alignItems="center">
+                      <Grid size={{ xs: 12, sm: member.primary ? 4 : 12 }}>
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            width: member.primary ? '100%' : 150,
+                            height: member.primary ? 300 : 150,
+                            mx: 'auto',
+                            borderRadius: member.primary ? 3 : '50%',
+                            overflow: 'hidden',
+                            boxShadow: `0 8px 32px ${alpha(colors.primary, 0.3)}`,
+                            opacity: member.placeholder ? 0.5 : 1,
+                            filter: member.placeholder ? 'grayscale(100%)' : 'none',
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={member.image}
+                            alt={member.name}
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: member.primary ? 8 : 12 }}>
+                        <Box sx={{ textAlign: member.primary ? 'left' : 'center' }}>
+                          <Typography 
+                            variant={member.primary ? "h4" : "h5"}
+                            component="h3"
+                            sx={{
+                              fontWeight: 'bold',
+                              fontFamily: fonts.heading,
+                              color: '#ffffff',
+                              mb: 1,
+                              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                            }}
+                          >
+                            {member.name}
+                          </Typography>
+                          <Typography 
+                            variant={member.primary ? "h6" : "body1"}
+                            sx={{
+                              color: member.primary ? colors.primary : colors.accent,
+                              mb: 2,
+                              fontWeight: 'medium',
+                              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                            }}
+                          >
+                            {member.role}
+                          </Typography>
+                          <Typography 
+                            variant="body1"
+                            sx={{
+                              color: alpha('#ffffff', 0.85),
+                              lineHeight: 1.8,
+                              fontFamily: fonts.body,
+                              textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                              fontSize: member.primary ? '1.1rem' : '1rem',
+                            }}
+                          >
+                            {member.bio}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                  </div>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+
+          {/* Product Modules Section */}
+          <Box sx={{ mt: 8, mb: 8 }}>
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
+                <Star sx={{ fontSize: 28, color: colors.accent }} />
+                <Typography 
+                  variant="h3" 
+                  component="h2" 
+                  sx={{
+                    fontWeight: 'bold',
+                    fontFamily: fonts.heading,
+                    background: gradients.multiGradient,
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.3))',
+                  }}
+                >
+                  Our Audit Modules
+                </Typography>
+                <Star sx={{ fontSize: 28, color: colors.primary }} />
+              </Box>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  color: alpha('#ffffff', 0.8),
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                  fontFamily: fonts.body,
+                  maxWidth: 800,
+                  mx: 'auto',
+                  mb: 4,
+                }}
+              >
+                Two powerful domains covering federal, commercial, and international compliance frameworks
+              </Typography>
+            </Box>
+
+            <Grid container spacing={4}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 0,
+                    background: alpha(colors.glassWhite, 0.1),
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${alpha(colors.primary, 0.3)}`,
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    height: '100%',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 16px 48px ${alpha(colors.primary, 0.3)}`,
+                    },
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      background: colors.primary,
+                      p: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}
+                  >
+                    <Assessment sx={{ fontSize: 32, color: '#ffffff' }} />
+                    <Box>
+                      <Typography variant="h5" sx={{ color: '#ffffff', fontWeight: 'bold' }}>
+                        Internal Audit Domain
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                        Comprehensive internal control testing
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ p: 3 }}>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 2 }}>
+                      Autonomous testing of internal controls, risk assessments, and compliance frameworks
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      <Chip label="Commercial" size="small" sx={{ background: alpha(colors.accent, 0.2), color: '#ffffff' }} />
+                      <Chip label="Federal" size="small" sx={{ background: alpha(colors.primary, 0.2), color: '#ffffff' }} />
+                      <Chip label="International" size="small" sx={{ background: alpha(colors.lottieGreen, 0.2), color: '#ffffff' }} />
+                    </Box>
+                  </Box>
+                </Paper>
+              </Grid>
+              
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 0,
+                    background: alpha(colors.glassWhite, 0.1),
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${alpha(colors.accent, 0.3)}`,
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    height: '100%',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 16px 48px ${alpha(colors.accent, 0.3)}`,
+                    },
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      background: colors.accent,
+                      p: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}
+                  >
+                    <VerifiedUser sx={{ fontSize: 32, color: '#ffffff' }} />
+                    <Box>
+                      <Typography variant="h5" sx={{ color: '#ffffff', fontWeight: 'bold' }}>
+                        External Audit Domain
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                        AI-first auditor-as-reviewer workflow
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ p: 3 }}>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 2 }}>
+                      60-80% time reduction through intelligent automation with auditors focusing on review
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      <Chip label="Commercial" size="small" sx={{ background: alpha(colors.accent, 0.2), color: '#ffffff' }} />
+                      <Chip label="Federal" size="small" sx={{ background: alpha(colors.primary, 0.2), color: '#ffffff' }} />
+                      <Chip label="International" size="small" sx={{ background: alpha('#64748B', 0.2), color: '#ffffff' }} />
+                    </Box>
+                  </Box>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
           
           <Divider 
             sx={{ 
@@ -613,7 +846,7 @@ const About = () => {
                 lineHeight: 1.6,
               }}
             >
-              At Buster & Co., everything we do is guided by serving, family, & cultivating happiness; unconditionally.
+              At BlackCore AI, we're guided by innovation, accuracy, and a commitment to transforming audit processes through intelligent automation.
             </Typography>
             
             <Grid container spacing={4}>

@@ -10,7 +10,7 @@ import CallToActionCarousel from './Components/ui/CallToActionCarousel';
 import ContactSection from './Components/ui/ContactSection';
 import ChatBot from './Components/ui/ChatBot';
 import Footer from './Components/ui/Footer';
-import ScrollingMarquee from './Components/ui/ScrollingMarquee';
+
 import { usePostHog } from './hooks/usePostHog';
 import { posthog } from './Context/PostHogProvider';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -62,12 +62,12 @@ const Home = () => {
 
       {/* Hero Section */}
       <Banner />
-      {/* <ScrollingMarquee /> */}
-      <Pillars />
-      <AboutSection />
+
       <MembershipPlans />
-      <CallToActionCarousel />
+      {/* <AboutSection /> */}
+      <Pillars />
       <ContactSection />
+      <CallToActionCarousel />
       <Footer />
       <ChatBot />
     </Box>

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Box, Typography, Stack, Button, alpha } from '@mui/material';
-import { Star, Bolt, TrendingUp } from '@mui/icons-material';
+import { Star, Bolt, TrendingUp, FiberManualRecord } from '@mui/icons-material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import Lottie from 'lottie-react';
-import verificationAnimation from '/public/verification-animation.json';
+import verificationAnimation from '/public/red-blob.json';
 import MobileMenu from './MobileMenu';
 import { useDataLayer } from '../../Context/DataLayer';
 import { useTheme } from '../../Context/ThemeContext';
@@ -13,16 +13,33 @@ const HeaderBar = () => {
   const currentPath = location.pathname;
   const { isAuthenticated, user } = useDataLayer();
   const { fonts, colors, gradients } = useTheme();
+  const [currentTime, setCurrentTime] = useState(new Date());
   
   const navItems = [
     { label: 'Home', path: '/' },
-    { label: 'Spotlight', path: '/spotlight' },
-    { label: 'Shop', path: '/shop' },
-    { label: 'Care Guide', path: '/care-guide' },
-    { label: 'Booking', path: '/booking' },
     { label: 'About', path: '/about'},
-    { label: 'Contact', path: '/contact' },
+    { label: 'Book Demo', path: '/booking' },
+    { label: 'Support', path: '/support' },
   ];
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format time to display
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  };
 
   // Get dashboard path based on user type
   const getDashboardPath = () => {
@@ -133,27 +150,107 @@ const HeaderBar = () => {
             />
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Star sx={{ fontSize: 20, color: colors.accent }} />
+            
             <Typography 
               variant="h6" 
               component="div" 
               sx={{ 
-                fontWeight: 'bold', 
-                background: gradients.primaryGradient,
+                fontWeight: 900, 
+                background: 'linear-gradient(90deg, #4A90FF 0%, #7B68EE 50%, #4A90FF 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                fontFamily: fonts.brand,
-                fontSize: '1.5rem',
-                letterSpacing: '0.5px',
-                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                filter: 'drop-shadow(0 1px 2px rgba(246, 81, 30, 0.3))',
+                fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+                fontSize: { xs: '1.4rem', sm: '1.8rem', md: '2rem' },
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                textShadow: '0 0 40px rgba(74, 144, 255, 0.5)',
+                filter: 'drop-shadow(0 0 20px rgba(123, 104, 238, 0.4))',
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -2,
+                  left: 0,
+                  right: 0,
+                  height: '2px',
+                  background: 'linear-gradient(90deg, transparent, #4A90FF, #7B68EE, transparent)',
+                  opacity: 0.6,
+                },
               }}
             >
-              Buster & Co.
+              BLACKCORE AI
             </Typography>
-            <Star sx={{ fontSize: 16, color: colors.primary }} />
+           
           </Box>
+        </Box>
+
+        {/* Operational Status Indicator */}
+        <Box
+          sx={{
+            display: { xs: 'none', sm: 'flex' },
+            alignItems: 'center',
+            gap: 2,
+            px: 2,
+            py: 0.75,
+            background: alpha(colors.glassWhite, 0.03),
+            backdropFilter: 'blur(10px)',
+            borderRadius: 2,
+            border: `1px solid ${alpha(colors.primary, 0.1)}`,
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              background: alpha(colors.glassWhite, 0.06),
+              border: `1px solid ${alpha(colors.primary, 0.2)}`,
+            }
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <FiberManualRecord 
+              sx={{ 
+                fontSize: 10, 
+                color: '#4CAF50',
+                filter: 'drop-shadow(0 0 6px #4CAF50)',
+                animation: 'pulse-green 2s ease-in-out infinite',
+                '@keyframes pulse-green': {
+                  '0%, 100%': { opacity: 1 },
+                  '50%': { opacity: 0.6 },
+                },
+              }} 
+            />
+            <Typography
+              sx={{
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                color: alpha('#ffffff', 0.7),
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Operational
+            </Typography>
+          </Box>
+          
+          <Box
+            sx={{
+              height: 16,
+              width: 1,
+              background: alpha(colors.primary, 0.2),
+            }}
+          />
+          
+          <Typography
+            sx={{
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              color: alpha('#ffffff', 0.9),
+              fontFamily: '"Roboto Mono", monospace',
+              letterSpacing: '0.02em',
+              minWidth: '110px',
+              textAlign: 'right',
+            }}
+          >
+            {formatTime(currentTime)}
+          </Typography>
         </Box>
         
         <Stack 

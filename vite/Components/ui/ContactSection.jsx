@@ -7,6 +7,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import SendIcon from '@mui/icons-material/Send';
 import { useTheme as useCustomTheme } from '../../Context/ThemeContext';
+import TrustedByMarquee from './TrustedByMarquee';
 
 const ContactSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -15,11 +16,11 @@ const ContactSection = () => {
   const theme = useTheme();
   const { colors, gradients, glassmorphism } = useCustomTheme();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    reason: '',
-    message: '',
-    company: ''
+    workEmail: '',
+    company: '',
+    country: '',
+    useCase: '',
+    honeypot: '' // Anti-bot field
   });
 
   const handleChange = (e) => {
@@ -30,15 +31,26 @@ const ContactSection = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.company) return;   // bot likely
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', formData);
-    // Reset form after submission
-    setFormData({ name: '', email: '', reason: '', message: '', company: '' });
-    // Show success message
-    setSnackOpen(true);
+    if (formData.honeypot) return;   // bot likely
+    
+    try {
+      // TODO: Send to API endpoint to create Lead and PendingOrg records
+      console.log('Access request submitted:', {
+        workEmail: formData.workEmail,
+        company: formData.company,
+        country: formData.country,
+        useCase: formData.useCase
+      });
+      
+      // Reset form after submission
+      setFormData({ workEmail: '', company: '', country: '', useCase: '', honeypot: '' });
+      // Show success message
+      setSnackOpen(true);
+    } catch (error) {
+      console.error('Error submitting access request:', error);
+    }
   };
 
   useEffect(() => {
@@ -77,7 +89,7 @@ const ContactSection = () => {
         clipPath: {
           xs: 'polygon(0 5%, 50% 10%, 100% 5%, 100% 100%, 0 100%)',
           sm: 'polygon(0 3%, 50% 8%, 100% 3%, 100% 100%, 0 100%)',
-          md: 'polygon(0 0, 50% 10%, 100% 0, 100% 100%, 0 100%)'
+          md: 'polygon(0 0, 50% 5%, 100% 0, 100% 100%, 0 100%)'
         },
         mt: { xs: -18, md: -6 },
         overflow: 'hidden',
@@ -200,7 +212,7 @@ const ContactSection = () => {
                   },
                 }}
               >
-                Let's Talk About Your Pet
+                Request Access
               </Typography>
 
               <Typography
@@ -213,10 +225,24 @@ const ContactSection = () => {
                   color: 'rgba(255, 255, 255, 0.9)',
                 }}
               >
-                Book an appointment, ask about our services, or just say hello. We're here to help your furry friend look and feel their best.
+                Join leading organizations using our AI-powered audit automation platform. Request access to streamline your compliance and audit processes.
               </Typography>
 
               <Stack spacing={4}>
+                                    
+                    {/* Trusted By Marquee - nested under Sales Inquiries */}
+                    <Box
+                      sx={{
+                        mt: 2,
+                        maxWidth: 'auto', // Constrain width to match the contact info area
+                        opacity: isVisible ? 1 : 0,
+                        transform: isVisible ? 'translateY(0)' : 'translateY(10px)',
+                        transition: 'opacity 0.8s ease, transform 0.8s ease',
+                        transitionDelay: '0.8s',
+                      }}
+                    >
+                      <TrustedByMarquee isContactSection={true} />
+                    </Box>
                 <Box 
                   sx={{ 
                     display: 'flex', 
@@ -256,10 +282,10 @@ const ContactSection = () => {
                   </Paper>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white' }}>
-                      Our Salon
+                      Global Headquarters
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                      123 Pet Paradise Lane, Brooklyn, NY 11201
+                      Enterprise compliance solutions worldwide
                     </Typography>
                   </Box>
                 </Box>
@@ -303,10 +329,10 @@ const ContactSection = () => {
                   </Paper>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white' }}>
-                      Call or Text
+                      Enterprise Support
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                      (555) PAW-CUTS
+                      24/7 availability for enterprise clients
                     </Typography>
                   </Box>
                 </Box>
@@ -350,10 +376,10 @@ const ContactSection = () => {
                   </Paper>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white' }}>
-                      Email Us
+                      Sales Inquiries
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                      hello@busterandco.com
+                      sales@auditplatform.com
                     </Typography>
                   </Box>
                 </Box>
@@ -394,10 +420,12 @@ const ContactSection = () => {
             >
               <TextField
                 type="text"
-                name="company"
-                value={formData.company || ''}
+                name="honeypot"
+                value={formData.honeypot || ''}
                 onChange={handleChange}
                 sx={{ display: 'none' }}
+                tabIndex={-1}
+                autoComplete="off"
               />
               
               <Box>
@@ -409,67 +437,17 @@ const ContactSection = () => {
                     fontWeight: 500,
                   }}
                 >
-                  Name
+                  Work Email
                 </Typography>
                 <TextField
                   required
                   fullWidth
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  variant="outlined"
-                  placeholder="Your name"
-                  InputProps={{
-                    sx: {
-                      ...glassmorphism.card,
-                      background: 'rgba(255, 255, 255, 0.12)',
-                      borderRadius: 2,
-                      height: 56,
-                      color: 'white',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        border: 'none'
-                      },
-                      '&:hover': {
-                        background: 'rgba(255, 255, 255, 0.15)',
-                      },
-                      '&.Mui-focused': {
-                        background: 'rgba(255, 255, 255, 0.18)',
-                        boxShadow: `0 0 0 2px ${colors.accent}40`,
-                      },
-                    }
-                  }}
-                  sx={{
-                    '& .MuiInputBase-input': {
-                      color: 'white',
-                      '&::placeholder': {
-                        color: 'rgba(255, 255, 255, 0.5)',
-                        opacity: 1,
-                      },
-                    }
-                  }}
-                />
-              </Box>
-              
-              <Box>
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    mb: 1, 
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    fontWeight: 500,
-                  }}
-                >
-                  Email
-                </Typography>
-                <TextField
-                  required
-                  fullWidth
-                  name="email"
+                  name="workEmail"
                   type="email"
-                  value={formData.email}
+                  value={formData.workEmail}
                   onChange={handleChange}
                   variant="outlined"
-                  placeholder="your.email@example.com"
+                  placeholder="your.name@company.com"
                   InputProps={{
                     sx: {
                       ...glassmorphism.card,
@@ -510,12 +488,62 @@ const ContactSection = () => {
                     fontWeight: 500,
                   }}
                 >
-                  Contact Reason
+                  Company
+                </Typography>
+                <TextField
+                  required
+                  fullWidth
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  variant="outlined"
+                  placeholder="Your company name"
+                  InputProps={{
+                    sx: {
+                      ...glassmorphism.card,
+                      background: 'rgba(255, 255, 255, 0.12)',
+                      borderRadius: 2,
+                      height: 56,
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        border: 'none'
+                      },
+                      '&:hover': {
+                        background: 'rgba(255, 255, 255, 0.15)',
+                      },
+                      '&.Mui-focused': {
+                        background: 'rgba(255, 255, 255, 0.18)',
+                        boxShadow: `0 0 0 2px ${colors.accent}40`,
+                      },
+                    }
+                  }}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      color: 'white',
+                      '&::placeholder': {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        opacity: 1,
+                      },
+                    }
+                  }}
+                />
+              </Box>
+              
+              <Box>
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    mb: 1, 
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    fontWeight: 500,
+                  }}
+                >
+                  Country/Region
                 </Typography>
                 <FormControl fullWidth required>
                   <Select
-                    name="reason"
-                    value={formData.reason}
+                    name="country"
+                    value={formData.country}
                     onChange={handleChange}
                     displayEmpty
                     sx={{
@@ -562,13 +590,17 @@ const ContactSection = () => {
                     }}
                   >
                     <MenuItem disabled value="" sx={{ fontStyle: 'italic', color: 'rgba(255, 255, 255, 0.5)' }}>
-                      How can we help you?
+                      Select your country/region
                     </MenuItem>
-                    <MenuItem value="appointment">Book an Appointment</MenuItem>
-                    <MenuItem value="services">Ask About Services</MenuItem>
-                    <MenuItem value="care-guide">Pet Care Question</MenuItem>
-                    <MenuItem value="grooming">Grooming Consultation</MenuItem>
-                    <MenuItem value="other">General Inquiry</MenuItem>
+                    <MenuItem value="US">United States</MenuItem>
+                    <MenuItem value="CA">Canada</MenuItem>
+                    <MenuItem value="UK">United Kingdom</MenuItem>
+                    <MenuItem value="EU">European Union</MenuItem>
+                    <MenuItem value="AU">Australia</MenuItem>
+                    <MenuItem value="APAC">Asia Pacific</MenuItem>
+                    <MenuItem value="LATAM">Latin America</MenuItem>
+                    <MenuItem value="MEA">Middle East & Africa</MenuItem>
+                    <MenuItem value="OTHER">Other</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -582,18 +614,18 @@ const ContactSection = () => {
                     fontWeight: 500,
                   }}
                 >
-                  Message
+                  Use Case
                 </Typography>
                 <TextField
                   required
                   fullWidth
                   multiline
                   rows={6}
-                  name="message"
-                  value={formData.message}
+                  name="useCase"
+                  value={formData.useCase}
                   onChange={handleChange}
                   variant="outlined"
-                  placeholder="Tell us about your pet and how we can help..."
+                  placeholder="Tell us about your audit and compliance needs. Which frameworks are you working with? What challenges are you looking to solve?"
                   InputProps={{
                     sx: {
                       ...glassmorphism.card,
@@ -662,7 +694,7 @@ const ContactSection = () => {
                   transition: 'all 0.3s ease',
                 }}
               >
-                Send Message
+                Request Access
               </Button>
             </Box>
           </Grid>
@@ -687,7 +719,7 @@ const ContactSection = () => {
             fontWeight: 500,
           }}
         >
-          Message sent — we'll get back to you soon! 🐾
+          Access request received — we'll review and get back to you within 24 hours!
         </MuiAlert>
       </Snackbar>
     </Box>

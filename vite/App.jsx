@@ -14,9 +14,7 @@ import Login from './views/Login';
 import AdminLogin from './views/AdminLogin';
 import About from './views/About';
 import Contact from './views/Contact';
-import Spotlight from './views/Spotlight';
-import Shop from './views/Shop';
-import CareGuide from './views/CareGuide';
+
 import Booking from './views/Booking';
 import Checkout from './Components/Checkout/Checkout';
 // import PluginsPage from './Dashboard/PluginsPage';
@@ -134,14 +132,12 @@ function App() {
       <Route path="/google-oauth-callback" element={<GoogleOAuthCallback />} />
 
       <Route path="/subscriptions" element={<Subscriptions />} />
-      <Route path="/spotlight" element={<Spotlight />} />
-      <Route path="/shop" element={<Shop />} />
-      <Route path="/care-guide" element={<CareGuide />} />
+  
       <Route path="/booking" element={<Booking />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/checkout/success" element={<Checkout />} />
       <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
+      <Route path="/support" element={<Contact />} />
       
       {/* Legal Routes */}
       <Route path="/privacy" element={<Privacy />} />

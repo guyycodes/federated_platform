@@ -1,26 +1,54 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Container,
   Typography,
   Breadcrumbs,
   Link,
-  alpha
+  alpha,
+  Paper,
+  TextField,
+  Button,
+  MenuItem,
+  Divider,
+  Grid
 } from '@mui/material';
+
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Star, Bolt, TrendingUp } from '@mui/icons-material';
+import { Star, CalendarMonth, AccessTime, Videocam } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import HeaderBar from '../Components/ui/HeaderBar';
 import Footer from '../Components/ui/Footer';
 import ChatBot from '../Components/ui/ChatBot';
 import MembershipPlans from '../Components/ui/MembershipPlans';
-import AnimatedDog from '../Components/ui/AnimatedDog';
 import { useTheme } from '../Context/ThemeContext';
 
 const Booking = () => {
   const { fonts, gradients, colors, glassmorphism } = useTheme();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    role: '',
+    companySize: '',
+    auditType: '',
+    message: ''
+  });
   
   useEffect(() => window.scrollTo(0, 0), []);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission
+    console.log('Demo request submitted:', formData);
+  };
 
   return (
     <>
@@ -94,7 +122,7 @@ const Booking = () => {
           color: '#ffffff',
           py: 8,
           position: 'relative',
-          backgroundImage: `${gradients.heroOverlay}, url("https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1350&q=80")`,
+          backgroundImage: `${gradients.heroOverlay}, url("https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1350&q=80")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           overflow: 'hidden'
@@ -131,7 +159,7 @@ const Booking = () => {
                 filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.3))',
               }}
             >
-              Book Now
+              Book a Demo
             </Typography>
             <Star sx={{ fontSize: 28, color: colors.accent }} />
           </Box>
@@ -147,7 +175,7 @@ const Booking = () => {
               fontFamily: fonts.body,
             }}
           >
-            Choose from monthly membership plans for ongoing savings, one-time appointments or gift cards.
+            Experience the power of AI-driven audit automation. Schedule a personalized demo to see how BlackCore AI can transform your audit processes.
           </Typography>
 
           <Breadcrumbs
@@ -174,49 +202,429 @@ const Booking = () => {
               Home
             </Link>
             <Typography color="#ffffff" sx={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
-              Booking
+              Book Demo
             </Typography>
           </Breadcrumbs>
         </Container>
       </Box>
 
-      {/* Enhanced Membership Plans Section */}
+      {/* Demo Booking Section */}
       <Box sx={{ py: 8, position: 'relative', zIndex: 1 }}>
         <Container maxWidth="lg">
-          {/* Section Header */}
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3 }}>
-              <Star sx={{ fontSize: 24, color: colors.accent }} />
-              <Typography 
-                variant="h3" 
-                component="h2"
-                sx={{ 
-                  fontWeight: 'bold',
-                  fontFamily: fonts.heading,
-                  background: gradients.primaryGradient,
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter: 'drop-shadow(0 2px 4px rgba(246, 81, 30, 0.5))',
+          {/* Demo Booking Form */}
+          <Grid container spacing={6} sx={{ mb: 8 }}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 4,
+                  background: alpha(colors.glassWhite, 0.1),
+                  backdropFilter: 'blur(20px)',
+                  border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                  borderRadius: 3,
+                  height: '100%',
                 }}
               >
-                Choose Your Plan
-              </Typography>
-              <Star sx={{ fontSize: 24, color: colors.primary }} />
-            </Box>
-            
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                color: alpha('#ffffff', 0.8),
-                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                fontFamily: fonts.body,
-                maxWidth: 600,
-                mx: 'auto',
-                lineHeight: 1.6,
+                <Typography
+                  variant="h4"
+                  component="h2"
+                  sx={{
+                    fontWeight: 'bold',
+                    fontFamily: fonts.heading,
+                    color: '#ffffff',
+                    mb: 3,
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                  }}
+                >
+                  Schedule Your Demo
+                </Typography>
+
+                <form onSubmit={handleSubmit}>
+                  <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Full Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#ffffff',
+                            '& fieldset': {
+                              borderColor: alpha('#ffffff', 0.3),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#ffffff', 0.5),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: colors.primary,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#ffffff', 0.7),
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Work Email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#ffffff',
+                            '& fieldset': {
+                              borderColor: alpha('#ffffff', 0.3),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#ffffff', 0.5),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: colors.primary,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#ffffff', 0.7),
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#ffffff',
+                            '& fieldset': {
+                              borderColor: alpha('#ffffff', 0.3),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#ffffff', 0.5),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: colors.primary,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#ffffff', 0.7),
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Job Title"
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#ffffff',
+                            '& fieldset': {
+                              borderColor: alpha('#ffffff', 0.3),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#ffffff', 0.5),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: colors.primary,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#ffffff', 0.7),
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        select
+                        label="Company Size"
+                        name="companySize"
+                        value={formData.companySize}
+                        onChange={handleChange}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#ffffff',
+                            '& fieldset': {
+                              borderColor: alpha('#ffffff', 0.3),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#ffffff', 0.5),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: colors.primary,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#ffffff', 0.7),
+                          },
+                        }}
+                      >
+                        <MenuItem value="1-50">1-50 employees</MenuItem>
+                        <MenuItem value="51-200">51-200 employees</MenuItem>
+                        <MenuItem value="201-1000">201-1000 employees</MenuItem>
+                        <MenuItem value="1000+">1000+ employees</MenuItem>
+                      </TextField>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        select
+                        label="Audit Type Interest"
+                        name="auditType"
+                        value={formData.auditType}
+                        onChange={handleChange}
+                        required
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#ffffff',
+                            '& fieldset': {
+                              borderColor: alpha('#ffffff', 0.3),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#ffffff', 0.5),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: colors.primary,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#ffffff', 0.7),
+                          },
+                        }}
+                      >
+                        <MenuItem value="internal">Internal Audit</MenuItem>
+                        <MenuItem value="external">External Audit</MenuItem>
+                        <MenuItem value="both">Both</MenuItem>
+                      </TextField>
+                    </Grid>
+                    <Grid size={12}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label="Tell us about your audit challenges"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#ffffff',
+                            '& fieldset': {
+                              borderColor: alpha('#ffffff', 0.3),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#ffffff', 0.5),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: colors.primary,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#ffffff', 0.7),
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={12}>
+                      <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        size="large"
+                        sx={{
+                          background: gradients.primaryGradient,
+                          color: '#ffffff',
+                          py: 2,
+                          fontWeight: 'bold',
+                          fontSize: '1.1rem',
+                          boxShadow: `0 4px 20px ${alpha(colors.primary, 0.3)}`,
+                          '&:hover': {
+                            background: gradients.primaryGradient,
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 6px 30px ${alpha(colors.primary, 0.4)}`,
+                          },
+                        }}
+                      >
+                        Request Demo
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </form>
+              </Paper>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {/* Demo Benefits */}
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 4,
+                    background: alpha(colors.glassWhite, 0.1),
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${alpha(colors.accent, 0.2)}`,
+                    borderRadius: 3,
+                    flex: 1,
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 'bold',
+                      fontFamily: fonts.heading,
+                      color: '#ffffff',
+                      mb: 3,
+                      textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    }}
+                  >
+                    What to Expect
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <Videocam sx={{ color: colors.primary, fontSize: 28, mt: 0.5 }} />
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 'bold', mb: 0.5 }}>
+                          Live Product Demo
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.8) }}>
+                          See BlackCore AI in action with a personalized walkthrough of features relevant to your needs
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <AccessTime sx={{ color: colors.accent, fontSize: 28, mt: 0.5 }} />
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 'bold', mb: 0.5 }}>
+                          30-Minute Session
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.8) }}>
+                          Efficient demo covering key features, ROI analysis, and Q&A tailored to your audit requirements
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <CalendarMonth sx={{ color: colors.primary, fontSize: 28, mt: 0.5 }} />
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 'bold', mb: 0.5 }}>
+                          Flexible Scheduling
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.8) }}>
+                          We'll contact you within 24 hours to schedule at your convenience
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ mt: 4, p: 3, background: alpha(colors.primary, 0.1), borderRadius: 2 }}>
+                    <Typography variant="body2" sx={{ color: '#ffffff', textAlign: 'center' }}>
+                      <strong>Trusted by leading audit firms</strong><br />
+                      Join organizations saving 60-80% on audit time
+                    </Typography>
+                  </Box>
+                </Paper>
+
+                {/* Quick Stats */}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      flex: 1,
+                      background: alpha(colors.glassWhite, 0.1),
+                      backdropFilter: 'blur(20px)',
+                      border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                      borderRadius: 2,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant="h4" sx={{ color: colors.primary, fontWeight: 'bold' }}>
+                      60-80%
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.7) }}>
+                      Time Reduction
+                    </Typography>
+                  </Paper>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      flex: 1,
+                      background: alpha(colors.glassWhite, 0.1),
+                      backdropFilter: 'blur(20px)',
+                      border: `1px solid ${alpha(colors.accent, 0.2)}`,
+                      borderRadius: 2,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant="h4" sx={{ color: colors.accent, fontWeight: 'bold' }}>
+                      100%
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.7) }}>
+                      Compliance
+                    </Typography>
+                  </Paper>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+
+          <Divider 
+            sx={{ 
+              my: 8,
+              background: gradients.primaryGradient,
+              height: 2,
+              border: 'none',
+              borderRadius: 1,
+            }} 
+          />
+
+          {/* Licensing Options Section Title */}
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 'bold',
+                fontFamily: fonts.heading,
+                background: gradients.multiGradient,
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 2,
               }}
             >
-              From premium memberships to gift cards, find the perfect grooming solution for your furry friend
+              Licensing Options
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: alpha('#ffffff', 0.8),
+                maxWidth: 600,
+                mx: 'auto',
+              }}
+            >
+              Choose the perfect plan for your organization's audit automation needs
             </Typography>
           </Box>
 
@@ -252,82 +660,7 @@ const Booking = () => {
             <MembershipPlans />
           </Box>
 
-          {/* Call-to-Action Section */}
-          <Box sx={{ textAlign: 'center', mt: 8 }}>
-            <Box
-              sx={{
-                display: 'inline-block',
-                background: alpha(colors.glassWhite, 0.1),
-                backdropFilter: 'blur(15px)',
-                borderRadius: 3,
-                p: 4,
-                border: `1px solid ${alpha(colors.accent, 0.2)}`,
-                boxShadow: `0 8px 32px ${alpha(colors.accent, 0.2)}`,
-                position: 'relative',
-                overflow: 'hidden',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: `0 12px 40px ${alpha(colors.accent, 0.3)}`,
-                  border: `1px solid ${alpha(colors.accent, 0.4)}`,
-                },
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: gradients.shimmerGradient,
-                  opacity: 0,
-                  transition: 'opacity 0.3s ease',
-                  pointerEvents: 'none',
-                },
-                '&:hover::before': {
-                  opacity: 0.1,
-                },
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
-                <Bolt sx={{ fontSize: 20, color: colors.accent }} />
-                <Typography 
-                  variant="h5" 
-                  sx={{ 
-                    fontWeight: 'bold',
-                    color: '#ffffff',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                    fontFamily: fonts.heading,
-                  }}
-                >
-                  Questions About Our Services?
-                </Typography>
-                <TrendingUp sx={{ fontSize: 20, color: colors.primary }} />
-              </Box>
-              
-              <Typography 
-                variant="body1" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8),
-                  textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                  fontFamily: fonts.body,
-                  mb: 2,
-                }}
-              >
-                Our friendly team is here to help you choose the perfect grooming plan for your pet
-              </Typography>
-              
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.6),
-                  textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                  fontFamily: fonts.body,
-                }}
-              >
-                Use our chat assistant below or contact us directly
-              </Typography>
-            </Box>
-          </Box>
+
         </Container>
       </Box>
 

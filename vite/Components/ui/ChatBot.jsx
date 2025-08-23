@@ -43,7 +43,7 @@ const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [conversation, setConversation] = useState([
-    { sender: 'bot', text: 'Hello! I\'m the Buster & Co. assistant. What can I assist you with today?', type: 'text' }
+    { sender: 'bot', text: 'Hello! I\'m the BlackCore AI assistant. How can I help you with your audit automation needs today?', type: 'text' }
   ]);
   const [currentStage, setCurrentStage] = useState('initial'); // initial, clarifying, definitive, support_ticket, form_collection
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -298,7 +298,7 @@ const ChatBot = () => {
 
   const resetConversation = () => {
     setConversation([
-      { sender: 'bot', text: 'Hello! I\'m the Buster & Co. assistant. What can I assist you with today?', type: 'text' }
+      { sender: 'bot', text: 'Hello! I\'m the BlackCore AI assistant. How can I help you with your audit automation needs today?', type: 'text' }
     ]);
     setCurrentStage('initial');
     setIsComplaintTicket(false);
@@ -579,7 +579,6 @@ const ChatBot = () => {
       return (
         <Grow in={true} timeout={500} style={{ transformOrigin: 'top left' }}>
           <ListItem
-            key={index}
             sx={{
               justifyContent: 'flex-start',
               mb: 2,
@@ -662,7 +661,6 @@ const ChatBot = () => {
       return (
         <Fade in={true} timeout={600}>
           <ListItem
-            key={index}
             sx={{
               justifyContent: 'flex-start',
               mb: 1,
@@ -742,7 +740,6 @@ const ChatBot = () => {
       return (
         <Grow in={true} timeout={500}>
           <ListItem
-            key={index}
             sx={{
               justifyContent: 'flex-start',
               mb: 1,
@@ -761,7 +758,6 @@ const ChatBot = () => {
       return (
         <Fade in={true} timeout={600}>
           <ListItem
-            key={index}
             sx={{
               justifyContent: 'flex-start',
               mb: 1,
@@ -816,7 +812,6 @@ const ChatBot = () => {
       return (
         <Fade in={true} timeout={600}>
           <ListItem
-            key={index}
             sx={{
               justifyContent: 'flex-start',
               mb: 1,
@@ -867,7 +862,6 @@ const ChatBot = () => {
     return (
       <MessageWrapper {...messageProps}>
         <ListItem
-          key={index}
           sx={{
             justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
             mb: 1,
@@ -1097,7 +1091,7 @@ const ChatBot = () => {
                     fontWeight: 'bold',
                   }}
                 >
-                  Buster & Co. Assistant
+                  BlackCore AI Assistant
                 </Typography>
                 <Typography 
                   variant="caption" 
@@ -1179,9 +1173,13 @@ const ChatBot = () => {
             }}
           >
             <List sx={{ py: 0 }}>
-              {conversation.map((msg, index) => renderMessage(msg, index))}
-              {isThinking && <ThinkingIndicator />}
-              <div ref={messagesEndRef} />
+              {conversation.map((msg, index) => (
+                <React.Fragment key={`msg-${index}`}>
+                  {renderMessage(msg, index)}
+                </React.Fragment>
+              ))}
+              {isThinking && <ThinkingIndicator key="thinking-indicator" />}
+              <div ref={messagesEndRef} key="messages-end" />
             </List>
           </Box>
 
@@ -1204,7 +1202,7 @@ const ChatBot = () => {
             <TextField
               fullWidth
               variant="outlined"
-              placeholder={currentStage === 'initial' ? "Tell me what you need help with..." : "Any additional questions?"}
+              placeholder={currentStage === 'initial' ? "Ask about demos, modules, or licensing..." : "Any additional questions?"}
               value={message}
               onChange={handleMessageChange}
               size="small"

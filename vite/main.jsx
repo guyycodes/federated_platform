@@ -79,8 +79,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       publishableKey={PUBLISHABLE_KEY}
       signInUrl="/login"
       signUpUrl="/register"
-      afterSignInUrl="/layout/dashboard"
-      afterSignUpUrl="/layout/dashboard"
+      // afterSignInUrl="/layout/dashboard"
+      // afterSignUpUrl="/layout/dashboard"
       userProfile={{ 
         sessionPollingInterval: 300000 // 5 minutes instead of default
       }}

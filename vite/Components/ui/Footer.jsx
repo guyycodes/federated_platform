@@ -17,6 +17,45 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useTheme } from '../../Context/ThemeContext';
 // import CredentialsWizard from '../authenticated/components/CredentialsWizard';
 
+// Footer Configuration
+const COMPANY_INFO = {
+  name: 'BlackCore AI',
+  tagline: 'AI-powered audit automation platform delivering 60-80% time reduction for Federal and Commercial audits.',
+  copyright: (year) => `© ${year} BlackCore AI. Audit Automation Platform. All rights reserved.`
+};
+
+const SOCIAL_LINKS = [
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/company/blackcoreai', icon: '/images/linkedin-color-svgrepo-com.svg', colorKey: 'accent' },
+  { name: 'Instagram', url: 'https://www.instagram.com/blackcoreai', icon: '/images/instagram-svgrepo-com.svg', colorKey: 'primary' },
+  { name: 'TikTok', url: 'https://www.tiktok.com/@blackcoreai', icon: '/images/tiktok-svgrepo-com.svg', colorKey: 'purple' }
+];
+
+const QUICK_LINKS = [
+  { label: 'Home', path: '/' },
+  { label: 'Book Demo', path: '/booking' },
+  { label: 'About', path: '/about' },
+  { label: 'Contact', path: '/contact' }
+];
+
+const PLATFORM_LINKS = [
+  { label: 'Demo', path: '/booking' },
+  { label: 'Login', path: '/login' },
+  { label: 'Admin Portal', path: '/admin-login' }
+];
+
+const NEWSLETTER_INFO = {
+  title: 'Audit Industry Insights',
+  description: 'Subscribe for audit automation insights, compliance updates, and industry best practices.',
+  placeholder: 'Your email address',
+  buttonText: 'Subscribe'
+};
+
+const LEGAL_LINKS = [
+  { label: 'Privacy Policy', path: '/privacy' },
+  { label: 'Terms of Service', path: '/terms' },
+  { label: 'Cookie Policy', path: '/cookies' }
+];
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { colors, gradients, fonts } = useTheme();
@@ -89,7 +128,7 @@ const Footer = () => {
                   fontFamily: fonts.heading,
                 }}
               >
-                Buster & Co.
+                {COMPANY_INFO.name}
               </Typography>
               <Star sx={{ fontSize: 24, color: colors.accent }} />
             </Box>
@@ -103,137 +142,44 @@ const Footer = () => {
                 lineHeight: 1.6,
               }}
             >
-              Professional mobile pet grooming services bringing stress-free care directly to your home.
+              {COMPANY_INFO.tagline}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-              <IconButton 
-                component="a"
-                href="https://www.linkedin.com/company/busterandco"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn" 
-                sx={{ 
-                  p: 1,
-                  background: alpha(colors.glassWhite, 0.1),
-                  backdropFilter: 'blur(10px)',
-                  border: `1px solid ${alpha(colors.accent, 0.3)}`,
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    transform: 'scale(1.15) translateY(-2px)',
-                    background: alpha(colors.glassWhite, 0.2),
-                    boxShadow: `0 8px 25px ${alpha(colors.accent, 0.4)}`,
-                    border: `1px solid ${alpha(colors.accent, 0.6)}`,
-                  } 
-                }}
-              >
-                <Box
-                  component="img"
-                  src="/images/linkedin-color-svgrepo-com.svg"
-                  alt="LinkedIn"
+              {SOCIAL_LINKS.map((social) => (
+                <IconButton 
+                  key={social.name}
+                  component="a"
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name} 
                   sx={{ 
-                    width: 24, 
-                    height: 24,
-                    filter: 'brightness(0) invert(1)',
+                    p: 1,
+                    background: alpha(colors.glassWhite, 0.1),
+                    backdropFilter: 'blur(10px)',
+                    border: `1px solid ${alpha(colors[social.colorKey], 0.3)}`,
+                    borderRadius: 2,
+                    transition: 'all 0.3s ease',
+                    '&:hover': { 
+                      transform: 'scale(1.15) translateY(-2px)',
+                      background: alpha(colors.glassWhite, 0.2),
+                      boxShadow: `0 8px 25px ${alpha(colors[social.colorKey], 0.4)}`,
+                      border: `1px solid ${alpha(colors[social.colorKey], 0.6)}`,
+                    } 
                   }}
-                />
-              </IconButton>
-              <IconButton 
-                component="a"
-                href="https://www.instagram.com/busterandco"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram" 
-                sx={{ 
-                  p: 1,
-                  background: alpha(colors.glassWhite, 0.1),
-                  backdropFilter: 'blur(10px)',
-                  border: `1px solid ${alpha(colors.primary, 0.3)}`,
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    transform: 'scale(1.15) translateY(-2px)',
-                    background: alpha(colors.glassWhite, 0.2),
-                    boxShadow: `0 8px 25px ${alpha(colors.primary, 0.4)}`,
-                    border: `1px solid ${alpha(colors.primary, 0.6)}`,
-                  } 
-                }}
-              >
-                <Box
-                  component="img"
-                  src="/images/instagram-svgrepo-com.svg"
-                  alt="Instagram"
-                  sx={{ 
-                    width: 24, 
-                    height: 24,
-                    filter: 'brightness(0) invert(1)',
-                  }}
-                />
-              </IconButton>
-              <IconButton 
-                component="a"
-                href="https://www.facebook.com/busterandco"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook" 
-                sx={{ 
-                  p: 1,
-                  background: alpha(colors.glassWhite, 0.1),
-                  backdropFilter: 'blur(10px)',
-                  border: `1px solid ${alpha(colors.secondary, 0.3)}`,
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    transform: 'scale(1.15) translateY(-2px)',
-                    background: alpha(colors.glassWhite, 0.2),
-                    boxShadow: `0 8px 25px ${alpha(colors.secondary, 0.4)}`,
-                    border: `1px solid ${alpha(colors.secondary, 0.6)}`,
-                  } 
-                }}
-              >
-                <Box
-                  component="img"
-                  src="/images/facebook-svgrepo-com.svg"
-                  alt="Facebook"
-                  sx={{ 
-                    width: 24, 
-                    height: 24,
-                    filter: 'brightness(0) invert(1)',
-                  }}
-                />
-              </IconButton>
-              <IconButton 
-                component="a"
-                href="https://www.tiktok.com/@busterandco"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok" 
-                sx={{ 
-                  p: 1,
-                  background: alpha(colors.glassWhite, 0.1),
-                  backdropFilter: 'blur(10px)',
-                  border: `1px solid ${alpha(colors.purple, 0.3)}`,
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    transform: 'scale(1.15) translateY(-2px)',
-                    background: alpha(colors.glassWhite, 0.2),
-                    boxShadow: `0 8px 25px ${alpha(colors.purple, 0.4)}`,
-                    border: `1px solid ${alpha(colors.purple, 0.6)}`,
-                  } 
-                }}
-              >
-                <Box
-                  component="img"
-                  src="/images/tiktok-svgrepo-com.svg"
-                  alt="TikTok"
-                  sx={{ 
-                    width: 24, 
-                    height: 24,
-                    filter: 'brightness(0) invert(1)',
-                  }}
-                />
-              </IconButton>
+                >
+                  <Box
+                    component="img"
+                    src={social.icon}
+                    alt={social.name}
+                    sx={{ 
+                      width: 24, 
+                      height: 24,
+                      filter: 'brightness(0) invert(1)',
+                    }}
+                  />
+                </IconButton>
+              ))}
             </Box>
           </Grid>
           
@@ -255,108 +201,26 @@ const Footer = () => {
               </Typography>
             </Box>
             <Stack spacing={1.5}>
-              <Link 
-                component={RouterLink} 
-                to="/" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.accent,
-                    textShadow: `0 0 10px ${colors.accent}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Home
-              </Link>
-              <Link 
-                component={RouterLink} 
-                to="/booking" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.primary,
-                    textShadow: `0 0 10px ${colors.primary}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Book Appointment
-              </Link>
-              {/* <Link 
-                component={RouterLink} 
-                to="/admin-login" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.secondary,
-                    textShadow: `0 0 10px ${colors.secondary}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Admin Portal
-              </Link> */}
-              <Link 
-                component={RouterLink} 
-                to="/care-guide" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.accent,
-                    textShadow: `0 0 10px ${colors.accent}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Care Guide
-              </Link>
-              <Link 
-                component={RouterLink} 
-                to="/about" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.primary,
-                    textShadow: `0 0 10px ${colors.primary}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                About
-              </Link>
-              <Link 
-                component={RouterLink} 
-                to="/contact" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.secondary,
-                    textShadow: `0 0 10px ${colors.secondary}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Contact
-              </Link>
+              {QUICK_LINKS.map((link, index) => (
+                <Link 
+                  key={link.path}
+                  component={RouterLink} 
+                  to={link.path} 
+                  underline="hover" 
+                  sx={{ 
+                    color: alpha('#ffffff', 0.8), 
+                    textDecoration: 'none',
+                    transition: 'all 0.3s ease',
+                    '&:hover': { 
+                      color: index % 2 === 0 ? colors.accent : index % 3 === 0 ? colors.secondary : colors.primary,
+                      textShadow: `0 0 10px ${index % 2 === 0 ? colors.accent : index % 3 === 0 ? colors.secondary : colors.primary}`,
+                      transform: 'translateX(4px)',
+                    } 
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </Stack>
           </Grid>
           
@@ -374,95 +238,30 @@ const Footer = () => {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                More
+                Platform
               </Typography>
             </Box>
             <Stack spacing={1.5}>
-              <Link 
-                component={RouterLink} 
-                to="/register" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.lottieGreen,
-                    textShadow: `0 0 10px ${colors.lottieGreen}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Register
-              </Link>
-              <Link 
-                component={RouterLink} 
-                to="/spotlight" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.accent,
-                    textShadow: `0 0 10px ${colors.accent}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Spotlight
-              </Link>
-              <Link 
-                component={RouterLink} 
-                to="/booking" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.primary,
-                    textShadow: `0 0 10px ${colors.primary}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Booking
-              </Link>
-              <Link 
-                component={RouterLink} 
-                to="/login" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.secondary,
-                    textShadow: `0 0 10px ${colors.secondary}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Login
-              </Link>
-              <Link 
-                component={RouterLink} 
-                to="/admin-login" 
-                underline="hover" 
-                sx={{ 
-                  color: alpha('#ffffff', 0.8), 
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    color: colors.purple,
-                    textShadow: `0 0 10px ${colors.purple}`,
-                    transform: 'translateX(4px)',
-                  } 
-                }}
-              >
-                Admin Portal
-              </Link>
+              {PLATFORM_LINKS.map((link, index) => (
+                <Link 
+                  key={link.path}
+                  component={RouterLink} 
+                  to={link.path} 
+                  underline="hover" 
+                  sx={{ 
+                    color: alpha('#ffffff', 0.8), 
+                    textDecoration: 'none',
+                    transition: 'all 0.3s ease',
+                    '&:hover': { 
+                      color: index === 0 ? colors.lottieGreen : index === 1 ? colors.accent : index === 2 ? colors.primary : index === 3 ? colors.secondary : colors.purple,
+                      textShadow: `0 0 10px ${index === 0 ? colors.lottieGreen : index === 1 ? colors.accent : index === 2 ? colors.primary : index === 3 ? colors.secondary : colors.purple}`,
+                      transform: 'translateX(4px)',
+                    } 
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </Stack>
           </Grid>
           
@@ -480,7 +279,7 @@ const Footer = () => {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                Get Pet Care Tips
+                {NEWSLETTER_INFO.title}
               </Typography>
               <Star sx={{ fontSize: 16, color: colors.primary }} />
             </Box>
@@ -493,12 +292,12 @@ const Footer = () => {
                 lineHeight: 1.6,
               }}
             >
-              Subscribe for weekly grooming tips and special offers for your furry family.
+              {NEWSLETTER_INFO.description}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <TextField
                 variant="outlined"
-                placeholder="Your email address"
+                placeholder={NEWSLETTER_INFO.placeholder}
                 size="small"
                 fullWidth
                 sx={{
@@ -556,7 +355,7 @@ const Footer = () => {
                   minWidth: 'auto',
                 }}
               >
-                Subscribe
+                {NEWSLETTER_INFO.buttonText}
               </Button>
             </Box>
           </Grid>
@@ -597,66 +396,33 @@ const Footer = () => {
                 textShadow: '0 1px 2px rgba(0,0,0,0.3)'
               }}
             >
-              © {currentYear} Buster & Co. Pet Grooming Services. All rights reserved.
+              {COMPANY_INFO.copyright(currentYear)}
             </Typography>
             <Star sx={{ fontSize: 16, color: colors.primary }} />
           </Box>
           
           <Box sx={{ display: 'flex', gap: 3 }}>
-            <Link 
-              component={RouterLink} 
-              to="/privacy" 
-              underline="hover" 
-              sx={{ 
-                color: alpha('#ffffff', 0.7), 
-                fontSize: '0.875rem',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                '&:hover': { 
-                  color: colors.accent,
-                  textShadow: `0 0 8px ${colors.accent}`,
-                  transform: 'translateY(-1px)',
-                } 
-              }}
-            >
-              Privacy Policy
-            </Link>
-            <Link 
-              component={RouterLink} 
-              to="/terms" 
-              underline="hover" 
-              sx={{ 
-                color: alpha('#ffffff', 0.7), 
-                fontSize: '0.875rem',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                '&:hover': { 
-                  color: colors.primary,
-                  textShadow: `0 0 8px ${colors.primary}`,
-                  transform: 'translateY(-1px)',
-                } 
-              }}
-            >
-              Terms of Service
-            </Link>
-            <Link 
-              component={RouterLink} 
-              to="/cookies" 
-              underline="hover" 
-              sx={{ 
-                color: alpha('#ffffff', 0.7), 
-                fontSize: '0.875rem',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                '&:hover': { 
-                  color: colors.secondary,
-                  textShadow: `0 0 8px ${colors.secondary}`,
-                  transform: 'translateY(-1px)',
-                } 
-              }}
-            >
-              Cookie Policy
-            </Link>
+            {LEGAL_LINKS.map((link, index) => (
+              <Link 
+                key={link.path}
+                component={RouterLink} 
+                to={link.path} 
+                underline="hover" 
+                sx={{ 
+                  color: alpha('#ffffff', 0.7), 
+                  fontSize: '0.875rem',
+                  textDecoration: 'none',
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    color: index === 0 ? colors.accent : index === 1 ? colors.primary : colors.secondary,
+                    textShadow: `0 0 8px ${index === 0 ? colors.accent : index === 1 ? colors.primary : colors.secondary}`,
+                    transform: 'translateY(-1px)',
+                  } 
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
           </Box>
         </Box>
       </Container>

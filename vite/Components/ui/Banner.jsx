@@ -1,80 +1,77 @@
 // Banner.jsx
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, Button, Container, Stack, alpha } from '@mui/material';
-// import CredentialsWizard from '../authenticated/components/CredentialsWizard';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Button, Container, alpha } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import PetsIcon from '@mui/icons-material/Pets';
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import { Star, Bolt, TrendingUp } from '@mui/icons-material';
+import { 
+  Bolt, TrendingUp, Shield, AutoAwesome,
+  BarChart, CheckCircle, ChevronRight 
+} from '@mui/icons-material';
 import { useTheme } from '../../Context/ThemeContext';
-import AnimatedDog from './AnimatedDog';
+import TrustedByMarquee from './TrustedByMarquee';
 
 const Banner = () => {
-  // const [wizardOpen, setWizardOpen] = useState(false);
   const navigate = useNavigate();
-  const videoRef = useRef(null);
   const { colors, gradients, fonts } = useTheme();
-  const [userInteracted, setUserInteracted] = useState(false);
+  const [counters, setCounters] = useState({ automation: 0, speed: 0, accuracy: 0 });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const handleVideoLoad = async () => {
-      if (videoRef.current) {
-        videoRef.current.playbackRate = 0.70;
-        
-        // Try to play the video, handling iOS restrictions
-        try {
-          await videoRef.current.play();
-        } catch (error) {
-          console.log('Autoplay failed (likely on iOS):', error);
-          // Optionally, you could show a play button here for mobile users
-        }
-      }
-    };
-
-    // Small delay to ensure video is loaded
-    const timer = setTimeout(handleVideoLoad, 100);
+    setIsVisible(true);
+    // Animate counters
+    const duration = 2000;
+    const steps = 60;
+    const interval = duration / steps;
     
-    return () => clearTimeout(timer);
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      
+      setCounters({
+        automation: Math.floor(97 * easeOut),
+        speed: Math.floor(15 * easeOut * 10) / 10,
+        accuracy: Math.floor(99.8 * easeOut * 10) / 10
+      });
+      
+      if (currentStep >= steps) clearInterval(timer);
+    }, interval);
+    
+    return () => clearInterval(timer);
   }, []);
-
-  // Handle user interaction to enable video playback on iOS
-  useEffect(() => {
-    const enableVideoPlayback = async () => {
-      if (!userInteracted && videoRef.current) {
-        try {
-          await videoRef.current.play();
-          setUserInteracted(true);
-        } catch (error) {
-          console.log('Video play after interaction failed:', error);
-        }
-      }
-    };
-
-    const handleInteraction = () => {
-      enableVideoPlayback();
-      // Remove listeners after first interaction
-      document.removeEventListener('touchstart', handleInteraction);
-      document.removeEventListener('click', handleInteraction);
-    };
-
-    // Add event listeners for user interaction
-    document.addEventListener('touchstart', handleInteraction, { passive: true });
-    document.addEventListener('click', handleInteraction);
-
-    return () => {
-      document.removeEventListener('touchstart', handleInteraction);
-      document.removeEventListener('click', handleInteraction);
-    };
-  }, [userInteracted]);
   
   const handleBookAppointment = () => {
     navigate('/booking');
   };
 
-  const handleVisitShop = () => {
-    navigate('/shop');
+  const handleVisitDemo = () => {
+    navigate('/demo');
   };
+
+  const stats = [
+    {
+      value: `${counters.automation}%`,
+      label: 'Automation Rate',
+      icon: Bolt,
+      color: colors.primary,
+      gradient: gradients.primaryGradient,
+    },
+    {
+      value: `${counters.speed}x`,
+      label: 'Faster Audits',
+      icon: TrendingUp,
+      color: colors.accent,
+      gradient: gradients.accentGradient,
+    },
+    {
+      value: `${counters.accuracy}%`,
+      label: 'Accuracy',
+      icon: Shield,
+      color: colors.lottieGreen,
+      gradient: gradients.multiGradient,
+    }
+  ];
 
   return (
     <Box
@@ -82,327 +79,327 @@ const Banner = () => {
       aria-label="Main banner"
       sx={{
         position: 'relative',
-        width: '100%',
-        height: 'calc(100vh - 64px)', // 64px is the standard AppBar height
+        minHeight: '100vh',
+        background: `linear-gradient(to bottom right, #0f0f11, #1a1a1f, #0f0f11)`,
         overflow: 'hidden',
-        backgroundColor: 'rgba(30,30,34, 1)',
       }}
     >
+      {/* Animated background elements */}
+      <Box sx={{ position: 'absolute', inset: 0 }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '80px',
+            left: '40px',
+            width: '288px',
+            height: '288px',
+            background: `${alpha(colors.primary, 0.2)}`,
+            borderRadius: '50%',
+            filter: 'blur(48px)',
+            // animation: 'pulse 3s ease-in-out infinite',
+            '@keyframes pulse': {
+              '0%, 100%': { opacity: 0.3, transform: 'scale(1)' },
+              '50%': { opacity: 0.8, transform: 'scale(1.1)' },
+            },
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: '80px',
+            right: '40px',
+            width: '384px',
+            height: '384px',
+            background: `${alpha(colors.accent, 0.2)}`,
+            borderRadius: '50%',
+            filter: 'blur(48px)',
+            animation: 'pulse 3s ease-in-out infinite',
+            // animationDelay: '2s',
+            '@keyframes pulse': {
+              '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
+              '60%': { opacity: 0.9, transform: 'scale(1.1)' },
+            },
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '500px',
+            height: '500px',
+            background: `${alpha(colors.lottieTeal, 0.1)}`,
+            borderRadius: '50%',
+            filter: 'blur(48px)',
+            animation: 'pulse 3s ease-in-out infinite',
+            animationDelay: '1s',
+          }}
+        />
+      </Box>
 
-
-      {/* White Fade Overlay - Top - Only on screens 600px+ */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 65,
-          left: 0,
-          right: 0,
-          width: '100%',
-          height: '15%',
-          background: 'linear-gradient(to bottom, rgba(30,30,34, 1) 0%, rgba(30,30,34, 0.8) 40%, rgba(30,30,34, 0) 100%)',
-          pointerEvents: 'none',
-          zIndex: 10,
-          // Only show on screens 600px and wider (sm and up)
-          display: { xs: 'block', sm: 'none' },
-        }}
-      />
-
-      {/* Background Video */}
-      <Box
-        component="video"
-        ref={videoRef}
-        // src="https://download.samplelib.com/mp4/sample-15s.mp4"
-        src="https://imgur.com/N1PB9qP.mp4"
-        alt="grooming van background"
-        autoPlay
-        muted
-        loop
-        playsInline
-        webkit-playsinline="true"
-        preload="auto"
-        aria-hidden="true"
-        sx={{
-          width: '100%',
-          height: { xs: '80%', sm: '100%' },
-          objectFit: 'fill',
-          transform: { 
-            xs: 'translate(0%, 10%)',  // Apply transform for screens <= 420px
-            sm: 'none'                 // No transform for screens > 600px
-          },
-          filter: 'brightness(0.7)',
-          // Custom breakpoint for 420px and below
-          '@media (max-width: 420px)': {
-            height: '80%',
-            transform: 'translate(0%, 10%)',
-          },
-          // Custom breakpoint for 421px to 600px
-          '@media (min-width: 421px) and (max-width: 600px)': {
-            height: '80%',
-            transform: 'translate(0%, 10%)',
-          },
-        }}
-      />
-      
-      {/* White Fade Overlay - Bottom - Responsive to video positioning */}
-      <Box
-        sx={{
-          position: 'absolute',
-          left: 0,
-          width: '100%',
-          background: 'linear-gradient(to bottom, rgba(30,30,34, 0.01) 0%, rgba(30,30,34, 1) 50%, rgba(30,30,34, 1) 100%)',
-          pointerEvents: 'none', // Allow clicks to pass through
-          zIndex: 1, // Above video but below content
-          // Responsive positioning to match video
-          top: { 
-            xs: 'calc(80% * 0.85 + 10%)', // For mobile: 80% video height * 85% + 10% transform offset
-            sm: '85%' // For larger screens: standard 85% from top
-          },
-          height: { 
-            xs: 'calc(80% * 0.15)', // For mobile: 15% of the 80% video height
-            sm: '15%' // For larger screens: standard 15%
-          },
-          // Custom breakpoints to match video behavior
-          '@media (max-width: 420px)': {
-            top: 'calc(80% * 0.85 + 10%)', // 80% video height * 85% position + 10% transform
-            height: 'calc(80% * 0.15)', // 15% of 80% video height
-          },
-          '@media (min-width: 421px) and (max-width: 600px)': {
-            top: 'calc(80% * 0.85 + 10%)', // 80% video height * 85% position (no transform)
-            height: 'calc(80% * 0.15)', // 15% of 80% video height
-          },
-        }}
-      />
-      
-      {/* Content Overlay */}
-      <Container
-        component="div"
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          color: 'white',
-          paddingLeft: { xs: 2, md: 8 },
-          paddingRight: { xs: 2, md: 0 },
-          maxWidth: { xs: '100%', md: '60%' },
-          zIndex: 2, // Above the white fade overlay
+      <Container 
+        maxWidth="lg" 
+        sx={{ 
+          position: 'relative', 
+          zIndex: 10, 
+          py: { xs: 8, md: 8 } 
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <Star sx={{ fontSize: { xs: 24, md: 32 }, color: colors.primary }} />
+        {/* Main content */}
+        <Box
+          sx={{
+            textAlign: 'center',
+            maxWidth: 'auto',
+            mx: 'auto',
+            transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+            opacity: isVisible ? 1 : 0,
+            transition: 'all 1s ease-out',
+          }}
+        >
+
+          {/* Title */}
           <Typography
             variant="h1"
             component="h1"
             sx={{
+              fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
               fontWeight: 'bold',
-              mb: 0,
-              fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
+              mb: 2,
               background: gradients.multiGradient,
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              textShadow: '0 4px 8px rgba(0,0,0,0.5)',
-              filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.3))',
+              lineHeight: 1.2,
               fontFamily: fonts.heading,
             }}
           >
-            Premium Pet Care,
+            BlackCore AI
+            
           </Typography>
-          <Star sx={{ fontSize: { xs: 20, md: 28 }, color: colors.accent }} />
-        </Box>
-        
-        <Typography
-          variant="h1"
-          component="span"
-          sx={{
-            fontWeight: 'bold',
-            mb: 2,
-            fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
-            background: gradients.accentGradient,
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            textShadow: '0 4px 8px rgba(0,0,0,0.5)',
-            filter: 'drop-shadow(0 2px 4px rgba(0,255,255,0.3))',
-            fontFamily: fonts.heading,
-          }}
-        >
-          At Your Door.
-        </Typography>
-        
-        <Typography
-          variant="h6"
-          component="p"
-          sx={{
-            mb: 3,
-            fontWeight: 'normal',
-            fontSize: { xs: '1.2rem', md: '1.5rem' },
-            color: '#ffffff',
-            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-            fontFamily: fonts.body,
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              left: -8,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: 4,
-              height: '80%',
-              background: gradients.primaryGradient,
-              borderRadius: 2,
-            }
-          }}
-        >
-          Professional mobile grooming services that bring stress-free care directly to your home.
-        </Typography>
-        
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: { xs: 'column', sm: 'row' }, 
-          gap: 2,
-          mb: 4
-        }}>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<Bolt />}
-            endIcon={<PetsIcon />}
-            aria-label="Book Appointment"
-            onClick={handleBookAppointment}
-            sx={{
-              background: gradients.multiGradient,
-              backgroundSize: '200% 200%',
-              color: '#ffffff',
-              fontWeight: 'bold',
-              padding: '12px 30px',
-              borderRadius: 3,
-              border: `2px solid ${alpha('#ffffff', 0.2)}`,
-              position: 'relative',
-              overflow: 'hidden',
-              animation: 'gradient-shift 4s ease infinite',
-              '@keyframes gradient-shift': {
-                '0%': { backgroundPosition: '0% 50%' },
-                '50%': { backgroundPosition: '100% 50%' },
-                '100%': { backgroundPosition: '0% 50%' },
-              },
-              '&:hover': {
-                background: gradients.glowGradient,
-                transform: 'scale(1.05)',
-                boxShadow: `0 8px 32px ${alpha(colors.primary, 0.5)}`,
-              },
-              '&:focus': {
-                outline: `3px solid ${colors.accent}`,
-                outlineOffset: '2px',
-              },
-              width: { xs: '100%', sm: 'fit-content' },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: '-100%',
-                width: '100%',
-                height: '100%',
-                background: gradients.shimmerGradient,
-                transition: 'left 0.5s',
-              },
-              '&:hover::before': {
-                left: '100%',
-              },
-            }}
-          >
-            Book Appointment
-          </Button>
-          
-          <Button
-            variant="outlined"
-            size="large"
-            startIcon={ <TrendingUp />}
-            endIcon={<ShoppingBagIcon />}
-            aria-label="Shop Pet Products"
-            onClick={handleVisitShop}
-            sx={{
-              borderColor: alpha('#ffffff', 0.3),
-              color: '#ffffff',
-              fontWeight: 'bold',
-              padding: '12px 30px',
-              borderRadius: 3,
-              background: alpha(colors.glassWhite, 0.1),
-              backdropFilter: 'blur(15px)',
-              border: `2px solid ${alpha('#ffffff', 0.3)}`,
-              position: 'relative',
-              overflow: 'hidden',
-              '&:hover': {
-                background: alpha(colors.glassWhite, 0.2),
-                borderColor: colors.accent,
-                color: colors.accent,
-                transform: 'scale(1.05)',
-                boxShadow: `0 8px 32px ${alpha(colors.accent, 0.3)}`,
-              },
-              '&:focus': {
-                outline: `3px solid ${colors.accent}`,
-                outlineOffset: '2px',
-              },
-              width: { xs: '100%', sm: 'fit-content' },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: '-100%',
-                width: '100%',
-                height: '100%',
-                background: gradients.shimmerGradient,
-                transition: 'left 0.5s',
-              },
-              '&:hover::before': {
-                left: '100%',
-              },
-            }}
-          >
-            Shop Pet Products
-          </Button>
-        </Box>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Star sx={{ fontSize: 16, color: colors.lottieGreen }} />
+
+          {/* Subtitle */}
           <Typography
-            variant="body1"
-            component="p"
+            variant="h5"
             sx={{
-              fontSize: { xs: '0.9rem', md: '1.1rem' },
-              opacity: 0.9,
-              color: '#ffffff',
-              textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+              color: alpha('#ffffff', 0.8),
+              mb: 4,
+              maxWidth: '800px',
+              mx: 'auto',
+              lineHeight: 1.6,
               fontFamily: fonts.body,
-              fontWeight: 500,
+              fontSize: { xs: '1.1rem', md: '1.3rem' },
             }}
           >
-            Licensed. Insured. Your pet's comfort is our priority.
+            Leverage cutting-edge AI to automate your entire audit lifecycle.
           </Typography>
-          <Star sx={{ fontSize: 16, color: colors.lottieTeal }} />
+
+          {/* CTA Buttons */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 2,
+              justifyContent: 'center',
+              mb: 4,
+            }}
+          >
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleBookAppointment}
+              endIcon={<ChevronRight />}
+              sx={{
+                background: gradients.primaryGradient,
+                color: '#ffffff',
+                fontWeight: 'bold',
+                px: 4,
+                py: 1.5,
+                borderRadius: 2,
+                fontSize: '1.1rem',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: `0 8px 32px ${alpha(colors.primary, 0.5)}`,
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                  transition: 'left 0.5s',
+                },
+                '&:hover::before': {
+                  left: '100%',
+                },
+              }}
+            >
+              Start Free Trial
+            </Button>
+            
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={handleVisitDemo}
+              startIcon={<BarChart />}
+              sx={{
+                color: '#ffffff',
+                borderColor: alpha('#ffffff', 0.3),
+                fontWeight: 'bold',
+                px: 4,
+                py: 1.5,
+                borderRadius: 2,
+                fontSize: '1.1rem',
+                background: alpha('#ffffff', 0.05),
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: alpha('#ffffff', 0.1),
+                  borderColor: colors.accent,
+                  color: colors.accent,
+                  transform: 'scale(1.05)',
+                },
+              }}
+            >
+              View Demo
+            </Button>
+          </Box>
+
+          {/* Stats Cards */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+              gap: 3,
+              maxWidth: '900px',
+              mx: 'auto',
+            }}
+          >
+            {stats.map((stat, index) => (
+              <Box
+                key={index}
+                sx={{
+                  transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+                  opacity: isVisible ? 1 : 0,
+                  transition: 'all 0.7s ease-out',
+                  transitionDelay: `${index * 100}ms`,
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    position: 'relative',
+                    background: alpha('#ffffff', 0.05),
+                    backdropFilter: 'blur(10px)',
+                    border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                    borderRadius: 3,
+                    p: 4,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      background: alpha('#ffffff', 0.1),
+                      boxShadow: `0 8px 32px ${alpha(stat.color, 0.3)}`,
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      p: 1.5,
+                      borderRadius: 2,
+                      background: stat.gradient,
+                      mb: 1,
+                    }}
+                  >
+                    <stat.icon sx={{ fontSize: 28, color: '#ffffff' }} />
+                  </Box>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      fontWeight: 'bold',
+                      color: '#ffffff',
+                      mb: 0,
+                      fontFamily: fonts.heading,
+                    }}
+                  >
+                    {stat.value}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: alpha('#ffffff', 0.6),
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      fontFamily: fonts.body,
+                    }}
+                  >
+                    {stat.label}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+
+          {/* Trust indicators */}
+          <Box
+            sx={{
+              mt: 4,
+              pt: 6,
+              borderTop: `1px solid ${alpha('#ffffff', 0.1)}`,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                opacity: 0.7,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CheckCircle sx={{ fontSize: 20, color: colors.lottieGreen }} />
+                <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.6) }}>
+                  SOC 2 Certified
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CheckCircle sx={{ fontSize: 20, color: colors.lottieGreen }} />
+                <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.6) }}>
+                  ISO 27001 Compliant
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CheckCircle sx={{ fontSize: 20, color: colors.lottieGreen }} />
+                <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.6) }}>
+                  Enterprise Ready
+                </Typography>
+              </Box>
+                                  
+            </Box>
+            {/* Trusted By Marquee - nested under Sales Inquiries */}
+            <Box
+              sx={{
+                mt: 2,
+                maxWidth: 'auto', // Constrain width to match the contact info area
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0)' : 'translateY(10px)',
+                transition: 'opacity 0.8s ease, transform 0.8s ease',
+                transitionDelay: '0.8s',
+              }}
+            >
+              <TrustedByMarquee />
+            </Box>
+          </Box>
         </Box>
       </Container>
-
-      {/* Animated Dog positioned below video area */}
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: { xs: '7%', sm: '5%' },
-          left: 0,
-          right: 0,
-          zIndex: 3, // Above all other content
-          pointerEvents: 'none', // Don't interfere with interactions
-        }}
-      >
-        <AnimatedDog />
-      </Box>
-
-      {/* Credentials Wizard Modal */}
-      {/* <CredentialsWizard open={wizardOpen} onClose={handleCloseWizard} /> */}
     </Box>
   );
 };

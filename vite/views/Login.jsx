@@ -21,11 +21,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Star, Bolt, TrendingUp } from '@mui/icons-material';
 import Lottie from 'lottie-react';
-import verificationAnimation from '/public/verification-animation.json';
+import verificationAnimation from '/public/red-blob.json';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 
 import { useDataLayer } from '../Context/DataLayer';
-import { membershipPlans, oneTimeServices, giftCardOptions, sizeCategories, getPriceBySize } from '../assets/pricing/membershipPlans';
+import { membershipPlans } from '../assets/pricing/membershipPlans';
 import HeaderBar from '../Components/ui/HeaderBar';
 import Footer from '../Components/ui/Footer';
 import GoogleLogin from '../Components/ui/GoogleLogin';
@@ -66,39 +66,24 @@ const Login = () => {
     if (currentPlan) {
       // Find the full plan details from our data sources
       const membershipPlan = membershipPlans.find(p => p.id === currentPlan.id);
-      const oneTimePlan = oneTimeServices.find(p => p.id === currentPlan.id);
-      const giftCardPlan = giftCardOptions.find(p => p.id === currentPlan.id);
-      const planData = membershipPlan || oneTimePlan || giftCardPlan;
       
-      if (planData) {
-        // Handle different service types
-        let serviceType, planType, planTitle, price;
-        
-        if (membershipPlan) {
-          serviceType = 'membership';
-          planType = 'membership';
-          planTitle = planData.title;
-          price = currentPlan.pricing || getPriceBySize(planData, currentPlan.selectedSize || 'small');
-        } else if (oneTimePlan) {
-          serviceType = 'one-time';
-          planType = 'one-time';
-          planTitle = planData.title;
-          price = currentPlan.pricing || getPriceBySize(planData, currentPlan.selectedSize || 'small');
-        } else if (giftCardPlan) {
-          serviceType = 'gift-card';
-          planType = 'gift-card';
-          planTitle = currentPlan.title || planData.title;
-          price = currentPlan.pricing;
-        }
-        
+      if (membershipPlan) {
+        // Handle membership plans for audit platform
         setSelectedPlan({
           planId: currentPlan.id,
-          planTitle: planTitle,
-          planType: planType,
-          selectedSize: currentPlan.selectedSize || 'small',
-          selectedAmount: currentPlan.selectedAmount,
-          price: price,
-          serviceType: serviceType
+          planTitle: membershipPlan.title,
+          planType: 'membership',
+          price: currentPlan.pricing || membershipPlan.priceMonthly,
+          serviceType: 'membership'
+        });
+      } else if (currentPlan.serviceType) {
+        // Handle other service types (demos, etc.)
+        setSelectedPlan({
+          planId: currentPlan.id,
+          planTitle: currentPlan.title || 'Demo Session',
+          planType: currentPlan.serviceType,
+          price: currentPlan.pricing || 'Free',
+          serviceType: currentPlan.serviceType
         });
       }
     }
@@ -129,8 +114,8 @@ const Login = () => {
           // For gift cards, redirect to gift card purchase page
           navigate(`/gift-cards?amount=${currentPlan.selectedAmount}&type=${currentPlan.id}`);
         } else if (currentPlan.serviceType === 'one-time') {
-          // For one-time services, redirect to book appointment
-          navigate(`/book-appointment?service=${currentPlan.id}&size=${currentPlan.selectedSize || 'small'}`);
+          // For one-time services, redirect to demo booking
+          navigate(`/booking?service=${currentPlan.id}`);
         } else {
           // For membership plans, redirect to subscriptions to complete
           navigate(`/subscriptions?plan=${currentPlan.id}&size=${currentPlan.selectedSize || 'small'}`);
@@ -161,7 +146,7 @@ const Login = () => {
     // Navigate directly to appropriate checkout page without login
     if (selectedPlan) {
       if (selectedPlan.serviceType === 'one-time') {
-        navigate(`/book-appointment?service=${selectedPlan.planId}&size=${selectedPlan.selectedSize}&checkout=true`);
+        navigate(`/booking?service=${selectedPlan.planId}&checkout=true`);
       } else if (selectedPlan.serviceType === 'gift-card') {
         navigate(`/gift-cards?amount=${selectedPlan.selectedAmount}&type=${selectedPlan.planId}&checkout=true`);
       }
@@ -341,7 +326,7 @@ const Login = () => {
             right: '25%',
             width: 96,
             height: 96,
-            background: gradients.multiGradient,
+            background: gradients.primaryGradient,
             borderRadius: '50%',
             opacity: 0.1,
             filter: 'blur(30px)',
@@ -489,7 +474,7 @@ const Login = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: gradients.multiGradient,
+                    background: gradients.primaryGradient,
                     borderRadius: '50%',
                     opacity: isTransitioning ? 1 : 0,
                     transition: 'opacity 0.3s ease-out',
@@ -527,7 +512,7 @@ const Login = () => {
                       left: -10,
                       right: -10,
                       bottom: -10,
-                      background: gradients.multiGradient,
+                      background: gradients.primaryGradient,
                       borderRadius: '50%',
                       opacity: 0.3,
                       filter: 'blur(15px)',
@@ -656,7 +641,7 @@ const Login = () => {
           >
             <Box sx={{ mb: 4, textAlign: 'center', position: 'relative', zIndex: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
-                <Star sx={{ fontSize: 24, color: colors.accent }} />
+                
                 <Box sx={{ width: 40, height: 40, mr: 1 }}>
                   <Lottie 
                     animationData={verificationAnimation} 
@@ -670,18 +655,21 @@ const Login = () => {
                   variant="h4" 
                   component="h1" 
                   sx={{
-                    fontWeight: 'bold',
-                    fontFamily: fonts.heading,
-                    background: gradients.primaryGradient,
+                    fontWeight: 900,
+                    background: 'linear-gradient(90deg, #4A90FF 0%, #7B68EE 50%, #4A90FF 100%)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    filter: 'drop-shadow(0 2px 4px rgba(246, 81, 30, 0.5))',
+                    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    textShadow: '0 0 40px rgba(74, 144, 255, 0.5)',
+                    filter: 'drop-shadow(0 0 20px rgba(123, 104, 238, 0.4))',
                   }}
                 >
-                  Buster & Co.
+                  BLACKCORE AI
                 </Typography>
-                <Star sx={{ fontSize: 24, color: colors.primary }} />
+                
               </Box>
               
               <Typography 
@@ -708,10 +696,10 @@ const Login = () => {
               >
                 {selectedPlan 
                   ? selectedPlan.serviceType === 'one-time'
-                    ? `Sign in to book your ${selectedPlan.planTitle} appointment`
+                    ? `Sign in to schedule your ${selectedPlan.planTitle} demo`
                     : selectedPlan.serviceType === 'gift-card'
-                    ? `Sign in to purchase your ${selectedPlan.planTitle}`
-                    : `Complete your ${selectedPlan.planTitle} subscription`
+                    ? `Sign in to complete your ${selectedPlan.planTitle} purchase`
+                    : `Complete your ${selectedPlan.planTitle} license`
                   : 'Sign in to continue'}
               </Typography>
               
@@ -805,7 +793,6 @@ const Login = () => {
                     >
                       <span>
                         {selectedPlan.planTitle}
-                        {selectedPlan.serviceType !== 'gift-card' && ` - ${sizeCategories[selectedPlan.selectedSize]?.label} Dog`}
                       </span>
                       <Chip 
                         size="small" 
@@ -833,10 +820,10 @@ const Login = () => {
                       }}
                     >
                       {selectedPlan.serviceType === 'one-time' 
-                        ? 'Sign in to book your appointment, or checkout as guest'
+                        ? 'Sign in to schedule your demo, or continue as guest'
                         : selectedPlan.serviceType === 'gift-card'
-                        ? 'Sign in to purchase your gift card, or checkout as guest'
-                        : 'Sign in to complete your subscription'}
+                        ? 'Sign in to complete your purchase, or continue as guest'
+                        : 'Sign in to activate your license'}
                     </Typography>
                     
                     {/* Enhanced Checkout as Guest Button */}
@@ -848,7 +835,7 @@ const Login = () => {
                           size="small"
                           startIcon={<Bolt />}
                           sx={{
-                            background: gradients.multiGradient,
+                            background: gradients.primaryGradient,
                             backgroundSize: '200% 200%',
                             color: '#ffffff',
                             fontSize: '0.875rem',
@@ -871,7 +858,7 @@ const Login = () => {
                             transition: 'all 0.3s ease',
                           }}
                         >
-                          Checkout as Guest
+                          Continue as Guest
                         </Button>
                       </Box>
                     )}
@@ -1043,7 +1030,7 @@ const Login = () => {
                     sx={{
                       background: isLoading 
                         ? alpha(colors.glassWhite, 0.1) 
-                        : gradients.multiGradient,
+                        : gradients.primaryGradient,
                       backgroundSize: '200% 200%',
                       color: '#ffffff',
                       py: 1.5,
@@ -1089,9 +1076,9 @@ const Login = () => {
                         Signing In...
                       </Box>
                     ) : selectedPlan?.serviceType === 'one-time' 
-                        ? 'Sign In & Book Appointment'
+                        ? 'Sign In & Schedule Demo'
                         : selectedPlan?.serviceType === 'gift-card'
-                        ? 'Sign In & Purchase Gift Card'
+                        ? 'Sign In & Complete Purchase'
                         : selectedPlan 
                         ? 'Sign In to Continue' 
                         : 'Sign In'}

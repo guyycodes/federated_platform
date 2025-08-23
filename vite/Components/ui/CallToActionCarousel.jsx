@@ -78,11 +78,11 @@ const CallToActionCarousel = () => {
         position: 'relative',
         overflow: 'hidden',
         color: '#ffffff',
-        clipPath: {
-          xs: 'polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%)',
-          sm: 'polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%)',
-          md: 'polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%)'
-        },
+        // clipPath: {
+        //   xs: 'polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%)',
+        //   sm: 'polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%)',
+        //   md: 'polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%)'
+        // },
         mb: { xs: -4, md: -6 },
       }}
     >
@@ -186,7 +186,7 @@ const CallToActionCarousel = () => {
               transitionDelay: '0.4s',
             }}
           >
-            Happy Customers, Happier Pups
+            Trusted by Leading Audit Teams
           </Typography>
           <Star 
             sx={{ 

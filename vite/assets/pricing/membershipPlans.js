@@ -1,135 +1,100 @@
-// Membership Plans for Dog Grooming Business
+// License Plans for BlackCore AI Audit Platform
 export const membershipPlans = [
   {
-    id: 'Rockies',
-    title: 'Rockies Bath Club',
-    priceSmall: '$50',
-    priceMedium: '$65',
-    priceLarge: '$75',
-    period: '/ month',
-    popularFeature: false,
-    description: 'Two wash & dry sessions per month with savings',
-    features: [
-      'Two Wash & Dry sessions/month',
-      'Free Nail Trim during one visit',
-      'Save $5-10 monthly',
-      'Flexible scheduling',
-    ],
-    savings: {
-      small: 'Save $10/month',
-      medium: 'Save $10/month', 
-      large: 'Save $5/month'
+    id: 'commercial',
+    title: 'Commercial License',
+    priceMonthly: '$599',
+    priceAnnual: '$5,990',
+    period: {
+      monthly: '/ month',
+      annual: '/ year'
     },
-    button: { label: 'Join Bath Club', variant: 'outlined' },
-  },
-  {
-    id: 'Rowdies',
-    title: 'Rowdies Grooming Club',
-    priceSmall: '$70',
-    priceMedium: '$85',
-    priceLarge: '$95',
-    period: '/ month',
     popularFeature: true,
-    description: 'One full groom monthly with exclusive perks',
+    description: 'AI-powered audit automation for commercial entities',
     features: [
-      'One Full Groom/month',
-      'Free Nail Trim included',
-      'Priority scheduling',
-      'Save up to $15 monthly',
+      'Unlimited automated audits',
+      'Commercial compliance templates',
+      'Risk assessment dashboard',
+      'Standard integrations',
+      'Email & chat support',
+      '97% automation rate',
+      'Export to PDF/Excel',
     ],
     savings: {
-      small: 'Save $5/month',
-      medium: 'Save $10/month',
-      large: 'Save $10/month'
+      monthly: 'Flexible monthly billing',
+      annual: 'Save $1,198 per year'
     },
-    button: { label: 'Start Membership', variant: 'contained' },
+    button: { label: 'Get Commercial Access', variant: 'contained' },
   },
   {
-    id: 'Busters',
-    title: 'Busters VIP Plan',
-    priceSmall: '$120',
-    priceMedium: '$140',
-    priceLarge: '$160',
-    period: '/ month',
+    id: 'federal',
+    title: 'Federal License',
+    priceMonthly: '$1,299',
+    priceAnnual: '$12,990',
+    period: {
+      monthly: '/ month',
+      annual: '/ year'
+    },
     popularFeature: false,
-    description: 'Ultimate care package for pampered pups',
+    description: 'FedRAMP compliant solution for government contractors',
     features: [
-      'Two Bath & Brush sessions/month',
-      'Full Groom every 6 weeks',
-      'Free Nail Trimming always',
-      'Priority scheduling',
-      'Free Doggy Daycare (up to 1hr/session)',
+      'Everything in Commercial',
+      'FedRAMP & FISMA compliant',
+      'Government audit frameworks',
+      'Secure GovCloud hosting',
+      'Priority support with SLA',
+      '99.8% accuracy guarantee',
+      'CMMC preparation tools',
+      'CAC/PIV authentication',
     ],
     savings: {
-      small: 'Best value!',
-      medium: 'Best value!',
-      large: 'Best value!'
+      monthly: 'Month-to-month flexibility',
+      annual: 'Save $2,598 per year'
     },
-    button: { label: 'Go VIP', variant: 'outlined' },
+    button: { label: 'Get Federal Access', variant: 'contained' },
+  },
+  {
+    id: 'international',
+    title: 'International License',
+    priceMonthly: '$1,999',
+    priceAnnual: '$19,990',
+    period: {
+      monthly: '/ month',
+      annual: '/ year'
+    },
+    popularFeature: false,
+    description: 'Global compliance across multiple jurisdictions',
+    features: [
+      'Everything in Federal',
+      'Multi-language support',
+      'International compliance frameworks',
+      'Multi-currency reporting',
+      'Global data residency options',
+      'White-label capabilities',
+      'Dedicated success manager',
+      '24/7 phone support',
+      'Custom training programs',
+    ],
+    savings: {
+      monthly: 'Pay as you grow',
+      annual: 'Save $3,998 per year'
+    },
+    button: { label: 'Request Access', variant: 'contained' },
   },
 ];
 
-// One-time service options
-export const oneTimeServices = [
-  {
-    id: 'in-&-out',
-    title: 'In-&-Out',
-    description: 'Quick service wash and dry only',
-    priceSmall: '$30',
-    priceMedium: '$35',
-    priceLarge: '$40',
-    features: ['Wash', 'Dry', 'Basic brush out']
+// Billing periods for toggle
+export const billingPeriods = {
+  monthly: {
+    label: 'Monthly',
+    value: 'monthly',
+    description: 'Cancel anytime'
   },
-  {
-    id: 'pop-in',
-    title: 'Pop-in Groom',
-    description: 'Complete grooming package',
-    priceSmall: '$75',
-    priceMedium: '$90',
-    priceLarge: '$105',
-    features: ['Wash', 'Dry', 'Brush', 'Trim/De-shedding', 'Nail trim available (+$15)']
+  annual: {
+    label: 'Annual',
+    value: 'annual', 
+    description: 'Best value'
   }
-];
-
-// Gift card options
-export const giftCardOptions = [
-  {
-    id: 'gift-50',
-    value: '$50',
-    description: 'Great for a full wash & dry session',
-    popular: false,
-    features: ['Digital or physical card', 'Never expires', 'Can be combined']
-  },
-  {
-    id: 'gift-100',
-    value: '$100',
-    description: 'Perfect for multiple services or large dogs',
-    popular: false,
-    features: ['Digital or physical card', 'Never expires', 'Can be combined']
-  },
-  {
-    id: 'gift-custom',
-    value: 'Custom',
-    description: 'Choose any amount $25 and up',
-    popular: false,
-    features: ['Digital or physical card', 'Never expires', 'Can be combined', 'You choose the amount']
-  }
-];
-
-// Size categories for easy reference
-export const sizeCategories = {
-  small: {
-    label: 'Small',
-    description: 'Up to 25 lbs',
-  },
-  medium: {
-    label: 'Medium',
-    description: '26-60 lbs',
-  },
-  large: {
-    label: 'Large', 
-    description: '61+ lbs',
-  },
 };
 
 // Helper function to get plan by ID
@@ -137,26 +102,32 @@ export const getPlanById = (planId) => {
   return membershipPlans.find(plan => plan.id === planId);
 };
 
-// Helper function to get price by size
-export const getPriceBySize = (plan, size) => {
-  switch(size) {
-    case 'small': return plan.priceSmall;
-    case 'medium': return plan.priceMedium;
-    case 'large': return plan.priceLarge;
-    default: return plan.priceSmall;
+// Helper function to get price by billing period
+export const getPriceByPeriod = (plan, period) => {
+  switch(period) {
+    case 'monthly': return plan.priceMonthly;
+    case 'annual': return plan.priceAnnual;
+    default: return plan.priceMonthly;
   }
 };
 
-// Helper function to calculate annual savings
-export const calculateAnnualSavings = (planId, size) => {
+// Helper function to calculate savings for annual billing
+export const calculateAnnualSavings = (planId) => {
   const plan = getPlanById(planId);
   if (!plan) return 0;
   
-  const savings = {
-    'Rockies': { small: 120, medium: 120, large: 60 }, // $10, $10, $5 x 12 months
-    'Rowdies': { small: 60, medium: 120, large: 120 }, // $5, $10, $10 x 12 months
-    'Busters': { small: 300, medium: 360, large: 400 }, // Estimated value
-  };
+  const monthlyPrice = parseInt(plan.priceMonthly.replace(/[$,]/g, ''));
+  const annualPrice = parseInt(plan.priceAnnual.replace(/[$,]/g, ''));
+  const yearlyFromMonthly = monthlyPrice * 12;
   
-  return savings[planId]?.[size] || 0;
-}; 
+  return yearlyFromMonthly - annualPrice;
+};
+
+// Helper function to get savings text
+export const getSavingsText = (plan, period) => {
+  if (period === 'annual') {
+    const savings = calculateAnnualSavings(plan.id);
+    return `Save $${savings.toLocaleString()} per year`;
+  }
+  return plan.savings.monthly;
+};

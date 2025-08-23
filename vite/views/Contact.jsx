@@ -11,7 +11,7 @@ import {
   alpha
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Star, Bolt, TrendingUp, LocationOn, Schedule, Phone, Email } from '@mui/icons-material';
+import { Star, Bolt, TrendingUp, Support, Business, Handshake, QuestionAnswer, AccessTime, HeadsetMic } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import HeaderBar from '../Components/ui/HeaderBar';
 import Footer from '../Components/ui/Footer';
@@ -117,7 +117,7 @@ const Contact = () => {
             right: '30%',
             width: 128,
             height: 128,
-            background: gradients.multiGradient,
+            background: gradients.primaryGradient,
             borderRadius: '50%',
             opacity: 0.15,
             filter: 'blur(40px)',
@@ -132,7 +132,7 @@ const Contact = () => {
           color: '#ffffff',
           py: 8,
           position: 'relative',
-          backgroundImage: `${gradients.heroOverlay}, url("https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1350&q=80")`,
+          backgroundImage: `${gradients.heroOverlay}, url("https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1350&q=80")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           overflow: 'hidden'
@@ -161,7 +161,7 @@ const Contact = () => {
               fontWeight="bold"
               sx={{
                 fontFamily: fonts.heading,
-                background: gradients.multiGradient,
+                background: gradients.primaryGradient,
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -169,7 +169,7 @@ const Contact = () => {
                 filter: 'drop-shadow(0 2px 4px rgba(255,255,255,0.3))',
               }}
             >
-              Contact Buster & Co.
+              Contact BlackCore AI
             </Typography>
             <Star sx={{ fontSize: 28, color: colors.accent }} />
           </Box>
@@ -186,7 +186,7 @@ const Contact = () => {
               fontFamily: fonts.body,
             }}
           >
-            Questions about our grooming services? Want to schedule an appointment? We're here to help make your pet look and feel their best.
+            Questions about our audit automation platform? Want to schedule a demo? We're here to help transform your audit processes with cutting-edge AI technology.
           </Typography>
           
           <Breadcrumbs
@@ -219,13 +219,13 @@ const Contact = () => {
         </Container>
       </Box>
       
-      {/* Enhanced Location Information Section */}
+      {/* Contact Options Section */}
       <Box sx={{ py: 8, position: 'relative', zIndex: 1 }}>
         <Container maxWidth="lg">
           {/* Section Header */}
           <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3 }}>
-              <LocationOn sx={{ fontSize: 24, color: colors.accent }} />
+              <HeadsetMic sx={{ fontSize: 24, color: colors.accent }} />
               <Typography 
                 variant="h3" 
                 component="h2"
@@ -239,9 +239,9 @@ const Contact = () => {
                   filter: 'drop-shadow(0 2px 4px rgba(246, 81, 30, 0.5))',
                 }}
               >
-                Visit Our Studio
+                Get in Touch
               </Typography>
-              <LocationOn sx={{ fontSize: 24, color: colors.primary }} />
+              <HeadsetMic sx={{ fontSize: 24, color: colors.primary }} />
             </Box>
             
             <Typography 
@@ -255,15 +255,16 @@ const Contact = () => {
                 lineHeight: 1.6,
               }}
             >
-              Professional grooming services in a comfortable, modern studio designed for your pet's comfort
+              Choose the best way to connect with our team based on your needs
             </Typography>
           </Box>
 
-          <Grid container spacing={5}>
-            <Grid size={{ xs: 12, md: 6 }}>
+          <Grid container spacing={4}>
+            {/* Sales & Demo Card */}
+            <Grid size={{ xs: 12, md: 4 }}>
               <div
-                ref={el => cardRefs.current['studio'] = el}
-                data-card-id="studio"
+                ref={el => cardRefs.current['sales'] = el}
+                data-card-id="sales"
               >
                 <Paper 
                   elevation={0}
@@ -276,8 +277,8 @@ const Contact = () => {
                     borderRadius: 3,
                     position: 'relative',
                     overflow: 'hidden',
-                    opacity: visibleCards['studio'] ? 1 : 0,
-                    transform: visibleCards['studio']
+                    opacity: visibleCards['sales'] ? 1 : 0,
+                    transform: visibleCards['sales']
                       ? 'translateY(0)' 
                       : 'translateY(30px)',
                     transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -304,117 +305,55 @@ const Contact = () => {
                     },
                   }}
                 >
-                  <Box sx={{ position: 'relative', zIndex: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                      <Star sx={{ fontSize: 20, color: colors.accent }} />
-                      <Typography 
-                        variant="h4" 
-                        component="h2" 
-                        sx={{
-                          fontWeight: 'bold',
-                          fontFamily: fonts.heading,
-                          background: gradients.primaryGradient,
-                          backgroundClip: 'text',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          filter: 'drop-shadow(0 2px 4px rgba(246, 81, 30, 0.5))',
-                        }}
-                      >
-                        Our Grooming Studio
-                      </Typography>
-                      <Star sx={{ fontSize: 20, color: colors.primary }} />
-                    </Box>
+                  <Box sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+                    <Business sx={{ fontSize: 48, color: colors.primary, mb: 2 }} />
+                    <Typography 
+                      variant="h5" 
+                      component="h3" 
+                      sx={{
+                        fontWeight: 'bold',
+                        fontFamily: fonts.heading,
+                        mb: 2,
+                        background: gradients.primaryGradient,
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
+                      Sales & Demos
+                    </Typography>
                     
-                    <Box sx={{ mb: 4 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                        <LocationOn sx={{ fontSize: 18, color: colors.accent }} />
-                        <Typography 
-                          variant="h6" 
-                          sx={{
-                            fontWeight: 'bold',
-                            color: '#ffffff',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                            fontFamily: fonts.heading,
-                          }}
-                        >
-                          Address
-                        </Typography>
-                      </Box>
-                      <Typography 
-                        variant="body1"
-                        sx={{
-                          color: alpha('#ffffff', 0.9),
-                          textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                          fontFamily: fonts.body,
-                          lineHeight: 1.8,
-                          ml: 3,
-                        }}
-                      >
-                        <strong>Buster & Co. Pet Grooming</strong><br />
-                        123 Pet Street #1<br />
-                        Your City, State 12345
-                      </Typography>
-                    </Box>
+                    <Typography 
+                      variant="body2"
+                      sx={{
+                        color: alpha('#ffffff', 0.9),
+                        mb: 3,
+                        fontFamily: fonts.body,
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      Schedule a personalized demo to see how BlackCore AI can transform your audit processes
+                    </Typography>
 
-                    <Box sx={{ mb: 4 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                        <Phone sx={{ fontSize: 18, color: colors.accent }} />
-                        <Typography 
-                          variant="h6" 
-                          sx={{
-                            fontWeight: 'bold',
-                            color: '#ffffff',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                            fontFamily: fonts.heading,
-                          }}
-                        >
-                          Contact Info
-                        </Typography>
-                      </Box>
+                    <Box sx={{ textAlign: 'left' }}>
                       <Typography 
-                        variant="body1"
+                        variant="body2"
                         sx={{
-                          color: alpha('#ffffff', 0.9),
-                          textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                          color: alpha('#ffffff', 0.8),
+                          mb: 1,
                           fontFamily: fonts.body,
-                          lineHeight: 1.8,
-                          ml: 3,
                         }}
                       >
-                        Phone: (555) 867-5309<br />
-                        Email: hello@busterandco.com
+                        <strong>sales@blackcoreai.com</strong>
                       </Typography>
-                    </Box>
-                    
-                    <Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                        <Schedule sx={{ fontSize: 18, color: colors.accent }} />
-                        <Typography 
-                          variant="h6" 
-                          sx={{
-                            fontWeight: 'bold',
-                            color: '#ffffff',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                            fontFamily: fonts.heading,
-                          }}
-                        >
-                          Business Hours
-                        </Typography>
-                      </Box>
                       <Typography 
-                        variant="body1"
+                        variant="body2"
                         sx={{
-                          color: alpha('#ffffff', 0.9),
-                          textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                          color: alpha('#ffffff', 0.7),
                           fontFamily: fonts.body,
-                          lineHeight: 1.8,
-                          ml: 3,
                         }}
                       >
-                        Monday - Friday: 8:00 AM - 6:00 PM<br />
-                        Saturday: 9:00 AM - 5:00 PM<br />
-                        Sunday: 10:00 AM - 4:00 PM<br />
-                        <em>Appointments recommended</em>
+                        Response time: 1 business day
                       </Typography>
                     </Box>
                   </Box>
@@ -422,10 +361,11 @@ const Contact = () => {
               </div>
             </Grid>
             
-            <Grid size={{ xs: 12, md: 6 }}>
+            {/* Technical Support Card */}
+            <Grid size={{ xs: 12, md: 4 }}>
               <div
-                ref={el => cardRefs.current['map'] = el}
-                data-card-id="map"
+                ref={el => cardRefs.current['support'] = el}
+                data-card-id="support"
               >
                 <Paper 
                   elevation={0}
@@ -438,12 +378,12 @@ const Contact = () => {
                     borderRadius: 3,
                     position: 'relative',
                     overflow: 'hidden',
-                    opacity: visibleCards['map'] ? 1 : 0,
-                    transform: visibleCards['map']
+                    opacity: visibleCards['support'] ? 1 : 0,
+                    transform: visibleCards['support']
                       ? 'translateY(0)' 
                       : 'translateY(30px)',
                     transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-                    transitionDelay: '0.2s',
+                    transitionDelay: '0.1s',
                     '&:hover': {
                       transform: 'translateY(-8px)',
                       boxShadow: `0 16px 48px ${alpha(colors.accent, 0.3)}`,
@@ -467,69 +407,290 @@ const Contact = () => {
                     },
                   }}
                 >
-                  <Box sx={{ position: 'relative', zIndex: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                      <Star sx={{ fontSize: 20, color: colors.accent }} />
-                      <Typography 
-                        variant="h4" 
-                        component="h2" 
-                        sx={{
-                          fontWeight: 'bold',
-                          fontFamily: fonts.heading,
-                          color: '#ffffff',
-                          textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                        }}
-                      >
-                        Find Us
-                      </Typography>
-                      <Star sx={{ fontSize: 20, color: colors.primary }} />
-                    </Box>
-                    
-                    <Box
+                  <Box sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+                    <Support sx={{ fontSize: 48, color: colors.accent, mb: 2 }} />
+                    <Typography 
+                      variant="h5" 
+                      component="h3" 
                       sx={{
-                        position: 'relative',
-                        borderRadius: 3,
-                        overflow: 'hidden',
-                        mb: 3,
-                        ...glassmorphism.card,
-                        '&:hover': {
-                          transform: 'scale(1.02)',
-                          boxShadow: `0 12px 40px ${alpha(colors.accent, 0.3)}`,
-                        },
-                        transition: 'all 0.3s ease',
+                        fontWeight: 'bold',
+                        fontFamily: fonts.heading,
+                        mb: 2,
+                        color: '#ffffff',
                       }}
                     >
-                      <Box 
-                        component="iframe"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3021.822873401838!2d-74.00799358459249!3d40.72820097932924!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25991b4d2fb85%3A0xf86c7812e4838bdb!2s123%20Pet%20Street%2C%20Your%20City%2C%20State%2012345!5e0!3m2!1sen!2sus!4v1683898200000!5m2!1sen!2sus"
-                        width="100%"
-                        height="300"
-                        style={{ border: 0, display: 'block' }}
-                        allowFullScreen=""
-                        loading="lazy"
-                        title="Buster & Co. Pet Grooming Location"
-                      />
-                    </Box>
+                      Technical Support
+                    </Typography>
                     
                     <Typography 
-                      variant="body1" 
+                      variant="body2"
                       sx={{
-                        color: alpha('#ffffff', 0.85),
-                        textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                        color: alpha('#ffffff', 0.9),
+                        mb: 3,
                         fontFamily: fonts.body,
                         lineHeight: 1.6,
                       }}
                     >
-                      Our full-service grooming studio is conveniently located with easy parking and a comfortable waiting area for pet parents.
+                      Get help with platform features, integrations, and technical questions
                     </Typography>
+
+                    <Box sx={{ textAlign: 'left' }}>
+                      <Typography 
+                        variant="body2"
+                        sx={{
+                          color: alpha('#ffffff', 0.8),
+                          mb: 1,
+                          fontFamily: fonts.body,
+                        }}
+                      >
+                        <strong>support@blackcoreai.com</strong>
+                      </Typography>
+                      <Typography 
+                        variant="body2"
+                        sx={{
+                          color: alpha('#ffffff', 0.7),
+                          mb: 2,
+                          fontFamily: fonts.body,
+                        }}
+                      >
+                        Standard: 24-48 hours<br />
+                        Enterprise: 4 hours / 24x7
+                      </Typography>
+                      <Typography 
+                        variant="caption"
+                        sx={{
+                          color: alpha('#ffffff', 0.6),
+                          fontFamily: fonts.body,
+                          display: 'block',
+                        }}
+                      >
+                        Visit our <Link sx={{ color: colors.accent, textDecoration: 'underline' }} href="#">Help Center</Link> for instant answers
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+              </div>
+            </Grid>
+
+            {/* Enterprise & Partnerships Card */}
+            <Grid size={{ xs: 12, md: 4 }}>
+              <div
+                ref={el => cardRefs.current['enterprise'] = el}
+                data-card-id="enterprise"
+              >
+                <Paper 
+                  elevation={0}
+                  sx={{ 
+                    p: 4, 
+                    height: '100%',
+                    background: alpha(colors.glassWhite, 0.1),
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                    borderRadius: 3,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    opacity: visibleCards['enterprise'] ? 1 : 0,
+                    transform: visibleCards['enterprise']
+                      ? 'translateY(0)' 
+                      : 'translateY(30px)',
+                    transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transitionDelay: '0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 16px 48px ${alpha(colors.primary, 0.3)}`,
+                      border: `1px solid ${alpha(colors.primary, 0.4)}`,
+                      background: alpha(colors.glassWhite, 0.15),
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: gradients.shimmerGradient,
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                      pointerEvents: 'none',
+                    },
+                    '&:hover::before': {
+                      opacity: 0.1,
+                    },
+                  }}
+                >
+                  <Box sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+                    <Handshake sx={{ fontSize: 48, color: colors.primary, mb: 2 }} />
+                    <Typography 
+                      variant="h5" 
+                      component="h3" 
+                      sx={{
+                        fontWeight: 'bold',
+                        fontFamily: fonts.heading,
+                        mb: 2,
+                        background: gradients.primaryGradient,
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
+                      Enterprise & Partners
+                    </Typography>
+                    
+                    <Typography 
+                      variant="body2"
+                      sx={{
+                        color: alpha('#ffffff', 0.9),
+                        mb: 3,
+                        fontFamily: fonts.body,
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      Custom solutions, volume licensing, and strategic partnership opportunities
+                    </Typography>
+
+                    <Box sx={{ textAlign: 'left' }}>
+                      <Typography 
+                        variant="body2"
+                        sx={{
+                          color: alpha('#ffffff', 0.8),
+                          mb: 1,
+                          fontFamily: fonts.body,
+                        }}
+                      >
+                        <strong>enterprise@blackcoreai.com</strong>
+                      </Typography>
+                      <Typography 
+                        variant="body2"
+                        sx={{
+                          color: alpha('#ffffff', 0.7),
+                          fontFamily: fonts.body,
+                        }}
+                      >
+                        Dedicated account management<br />
+                        Custom SLAs available
+                      </Typography>
+                    </Box>
                   </Box>
                 </Paper>
               </div>
             </Grid>
           </Grid>
 
+          {/* FAQ Section */}
+          <Box sx={{ mt: 8, mb: 6 }}>
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <QuestionAnswer sx={{ fontSize: 24, color: colors.accent, mb: 1 }} />
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 'bold',
+                  color: '#ffffff',
+                  fontFamily: fonts.heading,
+                  mb: 2,
+                }}
+              >
+                Quick Resources
+              </Typography>
+            </Box>
+            
+            <Grid container spacing={2} sx={{ maxWidth: 800, mx: 'auto' }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Link 
+                  href="#" 
+                  sx={{ 
+                    textDecoration: 'none',
+                    display: 'block',
+                    p: 2,
+                    borderRadius: 1,
+                    border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                    color: alpha('#ffffff', 0.9),
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      border: `1px solid ${alpha(colors.primary, 0.4)}`,
+                      background: alpha(colors.glassWhite, 0.05),
+                    }
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: fonts.body }}>
+                    Documentation →
+                  </Typography>
+                </Link>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Link 
+                  href="#" 
+                  sx={{ 
+                    textDecoration: 'none',
+                    display: 'block',
+                    p: 2,
+                    borderRadius: 1,
+                    border: `1px solid ${alpha(colors.accent, 0.2)}`,
+                    color: alpha('#ffffff', 0.9),
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      border: `1px solid ${alpha(colors.accent, 0.4)}`,
+                      background: alpha(colors.glassWhite, 0.05),
+                    }
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: fonts.body }}>
+                    API Reference →
+                  </Typography>
+                </Link>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Link 
+                  href="#" 
+                  sx={{ 
+                    textDecoration: 'none',
+                    display: 'block',
+                    p: 2,
+                    borderRadius: 1,
+                    border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                    color: alpha('#ffffff', 0.9),
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      border: `1px solid ${alpha(colors.primary, 0.4)}`,
+                      background: alpha(colors.glassWhite, 0.05),
+                    }
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: fonts.body }}>
+                    System Status →
+                  </Typography>
+                </Link>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Link 
+                  href="#" 
+                  sx={{ 
+                    textDecoration: 'none',
+                    display: 'block',
+                    p: 2,
+                    borderRadius: 1,
+                    border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                    color: alpha('#ffffff', 0.9),
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      border: `1px solid ${alpha(colors.primary, 0.4)}`,
+                      background: alpha(colors.glassWhite, 0.05),
+                    }
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: fonts.body }}>
+                    FAQ →
+                  </Typography>
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+
           {/* Call-to-Action Section */}
-          <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Box sx={{ textAlign: 'center', mt: 6 }}>
             <Box
               sx={{
                 display: 'inline-block',
@@ -575,7 +736,7 @@ const Contact = () => {
                     fontFamily: fonts.heading,
                   }}
                 >
-                  Ready to Schedule an Appointment?
+                  Ready to Transform Your Audit Process?
                 </Typography>
                 <TrendingUp sx={{ fontSize: 20, color: colors.primary }} />
               </Box>
@@ -588,7 +749,7 @@ const Contact = () => {
                   fontFamily: fonts.body,
                 }}
               >
-                Use our contact form below or give our chatbot a try to book your pet's grooming session
+                Fill out the form below to request access or schedule a personalized demo
               </Typography>
             </Box>
           </Box>
